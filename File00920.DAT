@@ -1,0 +1,1242 @@
+
+-- DEFENSIVE PLAY CALLING SCRIPT
+
+function DefensivePlay()
+        if (GETFKICKOFF() == 2) then  -- Following a safety
+                SETPLAYGROUP(CDKICKOFFRETURNSAFETY)
+                return
+        end
+
+        if (GETFKICKOFF() == 1) then
+            if (GETOFFPLAYGROUP(COKICKOFFONSIDE)) then
+                SETPLAYGROUP(CDKICKOFFRETURNONSIDE)
+                return
+            else
+                SETPLAYGROUP(CDKICKOFFRETURN)
+                return
+            end
+        end
+
+        if (GETYARDSTOENDZONE()  <= 3 or GETYARDSTOENDZONE() >= 97) then
+                if(GETOFFFORMATION() == SET_BIG or GETOFFFORMATION() == SET_JUMBO or GETOFFFORMATION() ==  SET_GOALLINE or GETOFFFORMATION() == SET_OVERLOAD or GETOFFFORMATION() == SET_WILDCAT) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDGOALRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDGOALPASS)
+                                return
+                        end
+                elseif(GETOFFFORMATION() == SET_NORMAL) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDGOALRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDGOALPASS)
+                                return
+                        end        
+                elseif(GETOFFFORMATION() == SET_3WR) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        end
+                elseif(GETOFFFORMATION()  == SET_4WR) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDNORM)
+                                return
+                        end
+                elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        end
+                elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDNORM)
+                                return
+                        end 
+                elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDNORM)
+                                return
+                        end        
+
+                elseif(GETOFFPLAYGROUP(COPUNT)) then  -- this is weird, but matches the legacy script
+                        SETPLAYGROUP(CDNORM)
+                        return
+                end
+        end
+
+        -- The next section checks to see if the offense lines up in a Goal Line set (JUMBO) anywhere on the field and calls an appropriate defense 
+        -- Added GOALLINE, WILDCAT, OVERLOAD and added a down check - LR 8/6/10
+
+        if (GETDISTANCETO1ST()  <= 1 and (GETDOWN() == 1 or GETDOWN() == 2)) then  -- Offense lines up in a Goal line set with 1 or less yards to go for the first
+                if(GETOFFFORMATION()  == SET_GOALLINE) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDGOALRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDGOALPASS)
+                                return
+                        end
+                elseif(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO or GETOFFFORMATION() == SET_OVERLOAD or GETOFFFORMATION() == SET_WILDCAT) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDNORM)
+                                return
+                        end        
+                elseif(GETOFFFORMATION() == SET_3WR) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDNICPASS)
+                                return
+                        end
+                elseif(GETOFFFORMATION()  == SET_4WR) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDNICRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDNICKEL)
+                                return
+                        end
+                elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDTRIPSRUN)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDTRIPSPASS)
+                                return
+                        end
+                elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDDIME)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDEMPTY)
+                                return
+                        end 
+                elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                        if(ISOFFENSIVEPLAYARUN()) then
+                                SETPLAYGROUP(CDBUNCH)
+                                return
+                        elseif(ISOFFENSIVEPLAYAPASS()) then
+                                SETPLAYGROUP(CDBUNCH)
+                                return
+                        end                
+                end
+
+                if(ISOFFENSIVEPLAYARUN()) then
+                        SETPLAYGROUP(CDRUN)
+                        return
+                elseif(ISOFFENSIVEPLAYAPASS()) then
+                        SETPLAYGROUP(CDPASS)
+                        return
+                end
+        end
+
+    -- check fg and punt formations
+        if (GETDOWN() ~= 4) then  -- Offense lines up in a Punt GETOFFFORMATION()  when it's not 4th down.  Don't expect them to punt
+                if(GETOFFPLAYGROUP(COPUNTMAXPROTECT) or GETOFFPLAYGROUP(COPUNTFAKEPUNT) or GETOFFPLAYGROUP(COPUNT)) then
+                        SETPLAYGROUP(CDNORM)
+                        return
+                end
+        end
+
+        if (GETDOWN()  == 4) then
+                if(GETOFFPLAYGROUP(COPUNTMAXPROTECT) or GETOFFPLAYGROUP(COPUNTFAKEPUNT) or GETOFFPLAYGROUP(COPUNT)) then
+                        if( GETRANDOMNUMBER(1) < 20 ) then
+                                SETPLAYGROUP(CDPUNTRETURNBLOCK)
+                                return
+                        end
+						if(GETYARDSTOENDZONE() <= 55 and GETDISTANCETO1ST() < 6) then
+								SETPLAYGROUP(CDPUNTRETURNSAFE)
+								return
+						end		
+                        SETPLAYGROUP(CDPUNTRETURN)
+                        return
+                end
+        end
+
+		if(GETOFFPLAYGROUP(COFG) or GETOFFPLAYGROUP(COFGFAKEFG)) then
+		
+			if(GETTIMEREMAININGHALF() <= 4 and GETYARDSTOENDZONE() >= 33) then
+				if(GETQUARTER() == 2) then
+					SETPLAYGROUP(CDFGRETURN)
+					return
+				end
+				if(GETQUARTER() == 4 and GETSCOREDIFF() <= 0) then
+					SETPLAYGROUP(CDFGRETURN)
+					return
+				end	
+			end
+			
+			if(GETRANDOMNUMBER(1) <= 5) then
+				SETPLAYGROUP(CDFGSAFE)
+				return
+			end			
+			
+			SETPLAYGROUP(CDFGBLOCK)
+			return
+	
+		end
+        
+        -- Offense in hail mary formation (and not in some weird, tricky situation).
+        if (GETOFFPLAYGROUP(COHAILMARY) and ISOFFENSIVEPLAYAPASS() and GETYARDSTOENDZONE() >= 20) then
+            if (GETTIMEREMAININGHALF() < 20) then
+                SETPLAYGROUP(CDDEFHAILMARY)
+                return
+            end
+        end
+
+        -- We've checked for all offensive sets inside the 5 yard line
+        -- We've also checked for goal line sets anywhere on the field
+        -- We've also checked for HAILMARY from offense.
+        -- Now we check down by down for all other situations
+        
+        -- Added new end of Half/Game logic below to use CDPREVENT and CDDEFHAILMARY AI Groups (LR 8/12/10)
+        -- Added new playgroup "CDCOCTIME" to counter an offense in COCTIMESAFE (AD 1/17/12)
+     
+        if(GETDOWN() == 1 or GETDOWN() == 2) then
+		
+		
+                if(GETSCOREDIFF() < 0 and GETTIMEREMAINING() <= 240) then
+					if(GETDISTANCETO1ST() <= 10) then
+						SETPLAYGROUP(CDRUN)
+						return
+					end	
+					SETPLAYGROUP(CDNORM)
+					return
+                end		
+
+                if(GETQUARTER() == 4) then
+                    if(GETOFFPLAYGROUP(COCTIMESAFE) and GETOFFFORMATION() < SET_EMPTY) then
+                        SETPLAYGROUP(CDCOCTIME)
+                        return
+                    end
+                end
+                
+                if (GETYARDSTOENDZONE() >= 39 and GETYARDSTOENDZONE() <= 70 and GETTIMEREMAININGHALF() <= 5) then
+                        if(GETSCOREDIFF() < 7) then
+                                SETPLAYGROUP(CDDIMEPASS)
+                                return
+                        end
+                        SETPLAYGROUP(CDNICPASS)
+                        return
+                end
+                if (GETYARDSTOENDZONE() >= 39 and GETYARDSTOENDZONE() <= 50 and GETTIMEREMAININGHALF() < 20 and GETOFFFORMATION() < SET_EMPTY) then
+                        if (GETQUARTER() == 4 and GETSCOREDIFF() == -7) then
+                                SETPLAYGROUP(CDDIMEPASS)
+                                return
+                        end
+                        if (GETQUARTER() == 2 and GETSCOREDIFF() >= -14) then
+                                SETPLAYGROUP(CDNICPASS)
+                                return
+                        end
+                        SETPLAYGROUP(CDNICPASS)
+                        return
+                end
+                -- 1st down is almost exactly the same as 2nd down except first GETDISTANCETO1ST()
+                -- If it's 1st or 2nd and more than 10 and you should be expecting the pass a little more than usual
+                if (GETDISTANCETO1ST() >= 10 and GETDOWN() == 1) then
+                        if(GETOFFFORMATION() == SET_NORMAL) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end       
+                 
+                if (GETDISTANCETO1ST() > 7 and GETDOWN() == 2) then  -- It's 1st or 2nd down with 8-10 GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end
+
+                if (GETDISTANCETO1ST() > 3 and GETDISTANCETO1ST() <= 7) then  -- It's 1st or 2nd down with 4-7 GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end        
+                        end
+                end
+
+                if (GETDISTANCETO1ST()  <= 3 and GETDISTANCETO1ST() > 1) then  -- It's 1st or 2nd down and 2-3 GETDISTANCETO1ST()  (CPU will expect the run and so this is going to be a good passing situation for the offense)
+                        if(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPSRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end
+
+                if (GETDISTANCETO1ST()  <= 1) then  -- It's 1st or 2nd down and 1 or less GETDISTANCETO1ST()  (CPU will really expect the run here and so this is going to be the ideal passing situation for the offense)
+                        if(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPSRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end        
+                        end
+                end
+        elseif(GETDOWN() == 3) then  -- 3RD DOWN SITUATIONS
+		
+                if(GETSCOREDIFF() < 0 and GETTIMEREMAINING() <= 240) then
+					if(GETDISTANCETO1ST() <= 10) then
+						SETPLAYGROUP(CDRUN)
+						return
+					end	
+					SETPLAYGROUP(CDNICRUN)
+					return
+                end		
+
+           
+                if (GETYARDSTOENDZONE() >= 39 and GETYARDSTOENDZONE() <= 50 and GETTIMEREMAININGHALF() < 20) then
+                        SETPLAYGROUP(CDDIMEPASS)
+                        return
+                end
+
+                if (GETDISTANCETO1ST() <= 9 and GETDISTANCETO1ST() > 5) then  -- It's 3rd down and 6-9 yards
+                         if(GETOFFFORMATION() == SET_NORMAL) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDDIMEPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        end
+                end
+                if (GETDISTANCETO1ST() > 9) then  -- It's 3rd down 9 or more GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+
+                                        SETPLAYGROUP(CDDIME)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDDIMEPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        end
+                end
+
+                if( GETDISTANCETO1ST() <= 5 and GETDISTANCETO1ST() > 2) then  -- It's 3rd down and 3-5 YTG
+                        if( GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDDIMEPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end
+                if (GETDISTANCETO1ST()  <= 2) then  -- It's 3rd down and 2 or less GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPSRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end
+        elseif(GETDOWN() == 4) then  -- 4TH DOWN SITUATIONS
+
+                if (GETYARDSTOENDZONE() >= 39 and GETYARDSTOENDZONE() <= 50 and GETTIMEREMAININGHALF() < 20) then
+                        if (GETQUARTER() == 4 and GETSCOREDIFF() == -7) then
+                                SETPLAYGROUP(CDDIMEPASS)
+                                return
+                        end
+                        if (GETQUARTER() == 2 and GETSCOREDIFF() >= -14) then
+                                SETPLAYGROUP(CDDIMEPASS)
+                                return
+                        end
+                        SETPLAYGROUP(CDDIMEPASS)
+                        return
+                end
+
+                if (GETDISTANCETO1ST() > 4) then  -- It's 4th down and 5 or more GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICKEL)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDDIMEPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNORM)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        end
+                end
+                if (GETDISTANCETO1ST() <= 4 and GETDISTANCETO1ST() > 2) then  -- It's 4th down and 3-4 GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPSRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPSPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDDIME)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDEMPTY)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end
+                if (GETDISTANCETO1ST()  <= 2) then  -- It's 4th down and 2 or less GETDISTANCETO1ST()
+                        if(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDGOALRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDGOALPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_3WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_4WR) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDNICPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_BIG) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDTRIPSRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDTRIPS)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION()  == SET_EMPTY) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDNICRUN)
+                                        return        
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDPASS)
+                                        return
+                                end 
+                        elseif(GETOFFFORMATION()  == SET_BUNCH) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDRUN)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDBUNCH)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_WILDCAT) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDWILDCAT)
+                                        return
+                                end
+                        elseif(GETOFFFORMATION() == SET_OVERLOAD) then
+                                if(ISOFFENSIVEPLAYARUN()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                elseif(ISOFFENSIVEPLAYAPASS()) then
+                                        SETPLAYGROUP(CDOVERLOAD)
+                                        return
+                                end
+                        end
+                end
+        end
+
+        if (GETYARDSTOENDZONE()  <= 4) then
+                SETPLAYGROUP(CDGOALLINE)
+                return
+        end
+        if (GETOFFPLAYGROUP(COHAILMARY)) then
+                SETPLAYGROUP(CDDEFHAILMARY)
+                return
+        end
+        if (GETDOWN()  <= 2 and GETDISTANCETO1ST()  >= 10) then
+                SETPLAYGROUP(CDNICPASS)
+                return
+        end
+        if (GETDOWN()  <= 2 and GETRANDOMNUMBER(1)  <= 50) then
+                SETPLAYGROUP(CDRUN)
+                return
+        end
+        if (GETDOWN()  <= 2) then
+                SETPLAYGROUP(CDNICPASS)
+                return
+        end
+        if (GETDOWN()  == 3 and GETDISTANCETO1ST()  < 4) then
+                SETPLAYGROUP(CDRUN)
+                return
+        end
+        if (GETDOWN()  == 3 and GETDISTANCETO1ST()  >= 8) then
+                SETPLAYGROUP(CDDIMEPASS)
+                return
+        end
+        if (GETDOWN()  == 3) then
+                SETPLAYGROUP(CDNICKEL)
+                return
+        end
+        if (GETDISTANCETO1ST()  < 3) then
+                SETPLAYGROUP(CDRUN)
+                return
+        end
+
+        SETPLAYGROUP(CDDIME)
+        return
+end
+
+-- Note that this section is not used
+function DefensiveSet()
+end

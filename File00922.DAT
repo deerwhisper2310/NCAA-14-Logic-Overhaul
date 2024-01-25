@@ -1,0 +1,150 @@
+
+function DefensiveTimeOut()
+	if (GETCLOCKISRUNNING()  == 0 and (GETOFFPLAYGROUP(COFG)or GETOFFPLAYGROUP(COFGFAKEFG)) and GETSCOREDIFF()  < 1 and GETSCOREDIFF()  > -4 and GETQUARTER()  == 4 and GETDEFTIMEOUTS() > 0 and GETTIMEREMAINING()  < 10) then  -- clock is stopped and we're just calling a TIMEOUT to ice the kicker on a game-winning or game-tying FG
+		if(GETDEFOFFSETTYPE() == PT_FG) then
+            SETPLAY(ICEKICKER)
+            return
+		end
+	end
+	if (GETCLOCKISRUNNING()  == 1) then
+		-- Don't take TIMEOUTs if the game is out of reach
+		if (GETSCOREDIFF()  < 50 and GETSCOREDIFF()  > -50) then
+		
+			-- Call TIMEOUT because they're inside their 10 and we want the ball back 
+			if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 120 and GETDEFTIMEOUTS()  >= 1 and GETYARDSTOENDZONE() > 90 and GETPLAYCLOCKREMAINING()  >= 30) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+		
+			-- Call TIMEOUT because it's 3rd down with a chance to get the ball back  		
+			if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  >  10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 3 and GETPLAYCLOCKREMAINING()  >= 30) then
+				if (GETYARDSTOENDZONE()  > 80 and GETDISTANCETO1ST()  > 1) then -- they're really backed up so we can be more aggressive, call it on 3rd and 2+
+					SETPLAY(TIMEOUT)
+					return
+				end
+				if (GETYARDSTOENDZONE()  > 60 and GETDISTANCETO1ST()  >= 7) then -- they're not threatening to score, call it on 3rd and 7+
+					SETPLAY(TIMEOUT)
+					return
+				end
+				if (GETDISTANCETO1ST()  >= 11) then -- it's 3rd and 11+, low chance of converting (don't want to call it if offense has 0-1 timeouts and in FG range under 40 seconds) 
+					if (GETYARDSTOENDZONE() > 55) then
+						SETPLAY(TIMEOUT)
+						return
+					end	
+					if (GETYARDSTOENDZONE() > 33 and GETTIMEREMAININGHALF() > 40) then
+						SETPLAY(TIMEOUT)
+						return
+					end						
+				end
+			end			
+
+			-- Call a TIMEOUT because it's 4th down and we can make them punt or kick the FG
+			if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  >= 10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 4 and GETPLAYCLOCKREMAINING()  >= 30) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+
+			-- Call a TIMEOUT inside :10 only if they are really backed up
+			if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 4 and GETYARDSTOENDZONE()  > 65) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+			
+			-- Between :40 and 2:00 remaining in the 1st half and they're in easy FG range (inside the 20)
+			if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  > 40 and GETYARDSTOENDZONE()  <= 20 and GETDEFTIMEOUTS()  >= 1 and GETPLAYCLOCKREMAINING()  >= 30 and (GETDOWN() >= 2 or (GETDOWN() == 1 and GETYARDSTOENDZONE() <= 11))) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+			
+			if (GETSCOREDIFF()  == 0) then
+			
+				-- Call TIMEOUT because they're inside their 10 and it's tied and we want the ball back 
+				if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 120 and GETDEFTIMEOUTS()  >= 1 and GETYARDSTOENDZONE() > 90) then
+					SETPLAY(TIMEOUT)
+					return
+				end
+				
+				-- Call TIMEOUT because it's tied with a 2nd and 13+ and they're not threatening to score and we have 2+ TOs
+				if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  < 15 and GETDEFTIMEOUTS()  >= 2 and GETDOWN()  == 2 and GETYARDSTOENDZONE()  > 65 and GETDISTANCETO1ST()  >= 13) then
+					SETPLAY(TIMEOUT)
+					return
+				end
+				
+				-- Call TIMEOUT because it's tied with a 3rd down 
+				if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  >  10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 3 and GETPLAYCLOCKREMAINING()  >= 30) then
+					if (GETYARDSTOENDZONE()  > 80 and GETDISTANCETO1ST()  > 2) then -- they're really backed up so we can be more aggressive, call it on 3rd and 3+
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETYARDSTOENDZONE()  > 60 and GETDISTANCETO1ST()  >= 8) then -- they're not threatening to score, call it on 3rd and 8+
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETDISTANCETO1ST()  >= 12) then -- it's 3rd and 12+, low chance of converting (don't want to call it if offense has 0-1 timeouts and in FG range under 40 seconds) 
+						if (GETYARDSTOENDZONE() > 55) then
+							SETPLAY(TIMEOUT)
+							return
+						end	
+						if (GETYARDSTOENDZONE() > 33 and GETTIMEREMAININGHALF() > 40) then
+							SETPLAY(TIMEOUT)
+							return
+						end						
+					end
+				end
+				
+				-- Call a TIMEOUT because it's 4th down and we can make them punt or kick the FG
+				if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  >= 10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 4) then
+					SETPLAY(TIMEOUT)
+					return
+				end
+
+				-- Call a TIMEOUT inside :10 only if they are really backed up
+				if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 4 and GETYARDSTOENDZONE()  > 65) then
+					SETPLAY(TIMEOUT)
+					return
+				end
+				
+			end
+			
+			-- we're losing at the end of the game, start calling TOs
+			if (GETQUARTER()  == 4 and GETTIMEREMAINING()  < 210 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  > 0 and GETPLAYCLOCKREMAINING()  >= 35) then
+				if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 24 and GETTIMEREMAINING() > 75) then -- down 3 scores, call TOs under 3:30 (but not under 1:15, since the game is definitely over by then)
+					SETPLAY(TIMEOUT)
+					return
+				end
+				if (GETTIMEREMAINING()  < 180 and GETSCOREDIFF()  >= 9 and GETSCOREDIFF()  <= 16 and GETTIMEREMAINING() > 20) then -- down 2 scores, call TOs under 3:00 (but not under 0:20, since the game is definitely over by then)
+					SETPLAY(TIMEOUT)
+					return
+				end
+				if (GETTIMEREMAINING()  < 150 and GETSCOREDIFF()  >= 1 and GETSCOREDIFF()  <= 8) then -- down 1 score, call TOs under 2:30
+					SETPLAY(TIMEOUT)
+					return
+				end
+			end
+			
+			-- Between :30 and 2:00 remaining in the game and it's tied but they're in FG range (inside the 28)
+			if (GETTIMEREMAINING()  < 120 and GETTIMEREMAINING()  > 30 and GETYARDSTOENDZONE()  <= 28 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  == 0 and GETPLAYCLOCKREMAINING()  >= 35) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+			
+			-- Between :30 and 2:00 remaining in the game and we're winning by 1-3 pts but they're in easier FG range (inside the 23)
+			if (GETTIMEREMAINING()  < 120 and GETTIMEREMAINING()  > 30 and GETYARDSTOENDZONE()  <= 23 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  <= -1 and GETSCOREDIFF()  >= -3 and GETPLAYCLOCKREMAINING()  >= 35) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+			
+			-- Between :40 and 2:00 remaining in the game and we're winning by 4-6 pts but they're inside the 11
+			if (GETTIMEREMAINING()  < 120 and GETTIMEREMAINING()  > 40 and GETYARDSTOENDZONE()  <= 11 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  <= -4 and GETSCOREDIFF()  >= -6 and GETPLAYCLOCKREMAINING()  >= 35) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+			
+			-- Between :40 and 2:00 remaining in the game and we're winning by 7-8 pts but they're inside the 11
+			if (GETTIMEREMAINING()  < 120 and GETTIMEREMAINING()  > 40 and GETYARDSTOENDZONE()  <= 11 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  <= -7 and GETSCOREDIFF()  >= -8 and GETPLAYCLOCKREMAINING()  >= 35) then
+				SETPLAY(TIMEOUT)
+				return
+			end
+		end
+	end
+end

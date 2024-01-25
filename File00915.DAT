@@ -1,0 +1,109 @@
+-- Logic for determining the range of a kicker.
+function Offense_DetermineKickersRange()
+
+    -- testing shortcut
+    -- return 37
+
+    local KickModifier = 0
+
+    -- GETWINDSTRENGTH's range is 0-100 where 100 is 20 mph winds.
+    -- At 20 mph winds, the kicker's distance is affected by 3 yards.
+    local windStrMod = (GETWINDSTRENGTH() / 33)
+    local windDir = GETWINDDIRECTION()
+
+    -- wind is in the face of the kicker, subtract yards
+    if (windDir > 225 and windDir < 315) then
+        KickModifier = KickModifier - windStrMod
+    -- wind is with the kicker, add yards
+    elseif (windDir > 45 and windDir < 135) then
+        KickModifier = KickModifier + windStrMod
+    end
+
+    -- Full precip (100) will deter the kicker by 5 yards max.  In game, precip actually only
+    -- reduces their range by ~3 yards, but this makes them appear more cautious.
+    KickModifier = KickModifier - GETPRECIPITATION()/20
+	
+	if(GETYARDSTOENDZONE() <= 41 and GETDISTANCETO1ST() > 13 and GETDOWN() == 4) then
+        KickModifier = KickModifier + 5
+	end
+	
+	if(GETYARDSTOENDZONE() <= 41 and GETDISTANCETO1ST() > 9 and GETDISTANCETO1ST() <= 13 and GETDOWN() == 4) then
+        KickModifier = KickModifier + 2
+	end	
+
+    -- you can try a longer one if there's no chance of the other team getting it back
+    if( (GETQUARTER() == 2 or GETQUARTER() == 4) and GETTIMEREMAININGQUARTER() <= 5) then
+        KickModifier = KickModifier + 6
+    end
+	
+	if(GETQUARTER() == 4 and GETTIMEREMAININGQUARTER() < 180 and GETSCOREDIFF() > 0) then
+        KickModifier = KickModifier - 3
+    end
+
+    local kickPower = GETKICKPOWER()
+
+    if (kickPower == 99) then
+	  return 43 + KickModifier -- 57 yarder
+	elseif (kickPower >= 97) then
+	  return 42 + KickModifier -- 56 yarder
+	elseif (kickPower >= 95) then
+	  return 41 + KickModifier -- 55 yarder
+	elseif (kickPower >= 93) then
+	  return 40 + KickModifier -- 54 yarder
+	elseif (kickPower >= 91) then
+	  return 39 + KickModifier -- 53 yarder
+	elseif (kickPower >= 89) then
+	  return 38 + KickModifier -- 52 yarder
+	elseif (kickPower >= 87) then
+	  return 37 + KickModifier -- 51 yarder
+	elseif (kickPower >= 85) then
+	  return 36 + KickModifier -- 50 yarder
+	elseif (kickPower >= 83) then
+	  return 35 + KickModifier -- 49 yarder
+	elseif (kickPower >= 81) then
+	  return 34 + KickModifier -- 48 yarder
+	elseif (kickPower >= 79) then
+	  return 33 + KickModifier -- 47 yarder
+	elseif (kickPower >= 77) then
+	  return 32 + KickModifier -- 46 yarder
+	elseif (kickPower >= 75) then
+	  return 31 + KickModifier -- 45 yarder
+	elseif (kickPower >= 73) then
+	  return 30 + KickModifier -- 44 yarder
+	elseif (kickPower >= 71) then
+	  return 29 + KickModifier -- 43 yarder
+	elseif (kickPower >= 69) then
+	  return 28 + KickModifier -- 42 yarder
+	elseif (kickPower >= 67) then
+	  return 27 + KickModifier -- 41 yarder
+	elseif (kickPower >= 65) then
+	  return 26 + KickModifier -- 40 yarder
+	elseif (kickPower >= 63) then
+	  return 25 + KickModifier -- 39 yarder
+	elseif (kickPower >= 61) then
+	  return 24 + KickModifier -- 38 yarder
+	elseif (kickPower >= 59) then
+	  return 23 + KickModifier -- 37 yarder
+	elseif (kickPower >= 57) then
+	  return 22 + KickModifier -- 36 yarder
+	elseif (kickPower >= 55) then
+	  return 21 + KickModifier -- 35 yarder
+	elseif (kickPower >= 53) then
+	  return 20 + KickModifier -- 34 yarder
+	elseif (kickPower >= 51) then
+	  return 19 + KickModifier -- 33 yarder
+	elseif (kickPower >= 49) then
+	  return 18 + KickModifier -- 32 yarder
+	elseif (kickPower >= 47) then
+	  return 17 + KickModifier -- 31 yarder
+	elseif (kickPower >= 45) then
+	  return 16 + KickModifier -- 30 yarder
+	elseif (kickPower >= 43) then
+	  return 15 + KickModifier -- 29 yarder
+	else
+      return 14 + KickModifier -- 28 yarder
+    end
+end
+
+	
+

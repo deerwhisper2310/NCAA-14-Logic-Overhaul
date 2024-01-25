@@ -1,0 +1,214 @@
+
+--  The following section determines when the CPU will call an audible on offense
+function OffensiveAudible()
+        if (GETFKICKOFF() == 0) then
+                if (GETFNOHUDDLE() > 1) then  -- NOHUDDLEHURRYUP situations
+						if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  <= 35 and GETTIMEREMAININGHALF()  >= 20 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:20-0:35 REMAINING IN THE 2ND QUARTER with 1 TIMEOUT remaining
+                                if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5) then  -- We're in FG range, but not inside the 5
+                                        if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
+                                                SETPLAYGROUP(COSTOPCLOCK)
+                                                return
+                                        end
+                                end
+                        end						
+						if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 30 and GETOFFTIMEOUTS()  == 0) then  -- UNDER 0:30 REMAINING IN THE 2ND QUARTER with no TIMEOUTs remaining
+                                if (GETYARDSTOENDZONE()  <= 40 and GETYARDSTOENDZONE()  > 10) then  -- We're in FG range, but not inside the 10
+                                        if (GETDOWN()  < 3) then  -- Spike on 1st / 2nd down
+                                                SETPLAYGROUP(COSTOPCLOCK)
+                                                return
+                                        end
+                                end
+								if (GETTIMEREMAININGHALF()  < 15 and GETYARDSTOENDZONE()  <= 65 and GETDOWN()  < 4) then  -- Spike when under :15, if at least in hail mary range
+										SETPLAYGROUP(COSTOPCLOCK)
+                                        return
+                                end
+                        end
+								if (GETSCOREDIFF()  < 0) then  -- WE'RE LOSING
+										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  <= 30 and GETTIMEREMAININGHALF()  >= 15 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:15-0:30 REMAINING IN THE 4TH QUARTER with 1 TIMEOUT remaining
+												if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5) then  -- We're in FG range, but not inside the 5
+														if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
+																SETPLAYGROUP(COSTOPCLOCK)
+																return
+														end
+												end
+										end								
+										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 35 and GETOFFTIMEOUTS()  == 0) then  -- UNDER 0:35 REMAINING IN THE 4TH QUARTER with no TIMEOUTs remaining
+												if (GETYARDSTOENDZONE()  <= 40) then  -- We're in FG range
+														if (GETDOWN()  < 3) then  -- Spike on 1st / 2nd down
+																SETPLAYGROUP(COSTOPCLOCK)
+																return
+														end
+												end
+												if (GETTIMEREMAININGHALF()  < 15 and GETYARDSTOENDZONE()  <= 65 and GETDOWN()  < 4) then  -- Spike when under :15, if at least in hail mary range
+														SETPLAYGROUP(COSTOPCLOCK)
+														return
+												end
+										end
+								end
+								if (GETSCOREDIFF()  == 0) then  -- WE'RE TIED
+										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  <= 30 and GETTIMEREMAININGHALF()  >= 15 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:15-0:30 REMAINING IN THE 4TH QUARTER with 1 TIMEOUT remaining
+												if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5) then  -- We're in FG range, but not inside the 5
+														if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
+																SETPLAYGROUP(COSTOPCLOCK)
+																return
+														end
+												end
+										end								
+										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 35 and GETOFFTIMEOUTS()  == 0) then  -- UNDER 0:35 REMAINING IN THE 4TH QUARTER with no TIMEOUTs remaining
+												if (GETYARDSTOENDZONE()  <= 40 and GETYARDSTOENDZONE()  > 10) then  -- We're in FG range, but not inside the 10
+														if (GETDOWN()  < 3) then  -- Spike on 1st / 2nd down
+																SETPLAYGROUP(COSTOPCLOCK)
+																return
+														end
+												end
+												if (GETTIMEREMAININGHALF()  < 15 and GETYARDSTOENDZONE()  <= 65 and GETDOWN()  < 4) then  -- Spike when under :16, if at least in hail mary range
+														SETPLAYGROUP(COSTOPCLOCK)
+														return
+												end
+										end
+								end	
+								SETPLAYGROUP(COCTIME)
+								return
+                end
+                -- not no huddle
+				
+				-- AUDIBLES!
+				
+				if(((GETQUARTER() <= 2 and GETTIMEREMAININGHALF() > 120) or (GETQUARTER() >= 3 and GETTIMEREMAININGHALF() > 240) or GETQUARTER() >= 5) and GETYARDSTOENDZONE() < 95 and GETYARDSTOENDZONE() > 4) then -- no audibles inside 2 minutes in 1st half or 4 minutes in 2nd half, or near either goal line, to avoid conflicts with playcalling logic
+				
+					if(GETDEFPLAYGROUP(CDDIME) or GETDEFPLAYGROUP(CDDIMEPASS)) then -- D has weak box on a running down & distance
+						if(GETRANDOMNUMBER(1)  <= 20) then
+							if(GETDOWN()  == 1 and GETDISTANCETO1ST() <= 10) then
+								SETPLAYGROUP(COWTIME)
+								return
+							end
+							if(GETDOWN()  == 2 and GETDISTANCETO1ST() <= 5) then
+								SETPLAYGROUP(COWTIME)
+								return
+							end
+							if(GETDOWN()  == 3 and GETDISTANCETO1ST() <= 2) then
+								SETPLAYGROUP(COWTIME)
+								return
+							end
+							if(GETDOWN()  == 4 and GETDISTANCETO1ST() <= 1) then
+								SETPLAYGROUP(COWTIME)
+								return
+							end
+						end	
+					end	
+					
+					if((GETDEFPLAYGROUP(CDRUN) or GETDEFPLAYGROUP(CDNICRUN) or GETDEFPLAYGROUP(CDTRIPSRUN))) then -- D calls blitz/run formation, audible to quick pass
+						if(GETRANDOMNUMBER(1)  <= 10) then
+							if(GETDISTANCETO1ST() > 1) then
+								if(GETDOWN()  <= 2) then
+									SETPLAYGROUP(COCTIME)
+									return
+								end
+								if(GETDOWN()  == 3 and GETDISTANCETO1ST() <= 14) then
+									SETPLAYGROUP(COCTIME)
+									return
+								end	
+								if(GETDOWN()  == 4 and GETDISTANCETO1ST() <= 10) then
+									SETPLAYGROUP(COCTIME)
+									return
+								end
+							end	
+						end	
+					end
+					
+					if(GETDOWN() == 1 or GETDOWN() == 2) then -- Random 1st/2nd down audible
+						if(GETRANDOMNUMBER(1)  >= 98) then
+							SETPLAYGROUP(COFIRSTDOWN)
+							return
+						end
+					end
+	
+					if(GETDOWN()  == 3) then -- Random 3rd down audible
+						if(GETRANDOMNUMBER(1)  >= 98) then
+							if(GETDISTANCETO1ST() <= 2) then
+								SETPLAYGROUP(COFIRSTDOWN)
+								return
+							end	
+							if(GETDISTANCETO1ST() > 2) then
+								SETPLAYGROUP(CO3RDLONG)
+								return
+							end
+						end	
+					end
+				
+				end
+				
+				
+				
+				
+                if(GETOFFPLAYGROUP(COFGFAKEFG) or GETOFFPLAYGROUP(COFG)) then
+                elseif(GETOFFPLAYGROUP(COPUNT)) then
+                        if(GETDEFPLAYGROUP(CDPUNTRETURN) or GETDEFPLAYGROUP(CDPUNTRETURNSAFE)) then
+                        else
+                                SETPLAYGROUP(COPUNTMAXPROTECT)
+                                return
+                        end
+                elseif(GETOFFPLAYGROUP(COWTIME)) then  -- CPU is trying to waste time and this will prevent the user from forcing them to pass
+                        if (GETSCOREDIFF()  > 0 and GETQUARTER()  == 4 and GETTIMEREMAININGQUARTER()  <= 210)  -- This is acutally the check to see if CPU is trying to waste time.
+                                then  -- This was hitting true because some plays belonged to COWTIME and but the situation did not call for COWTIME
+                                if(GETDEFPLAYGROUP(CDPUNTRETURN) or GETDEFPLAYGROUP(CDPUNTRETURNSAFE) or GETDEFPLAYGROUP(CDPUNTRETURNBLOCK) or GETDEFPLAYGROUP(CDFGBLOCK)) then
+                                        SETPLAYGROUP(COWTIME)
+                                        return
+                                else
+                                end
+                        end
+                else
+                        if(GETDEFPLAYGROUP(CDGOALRUN) or GETDEFPLAYGROUP(CDGOALLINE)) then
+                                -- calling goal line when not needed
+                                if (GETTIMEREMAINING() > 180 and GETSCOREDIFF()  <= 0) then
+                                        if (GETYARDSTOENDZONE()  > 12) then
+                                                if (GETDOWN()  == 1 and GETRANDOMNUMBER(1)  < 35) then
+                                                        SETPLAYGROUP(COCTIME)
+                                                        return
+                                                end
+                                                if (GETDOWN()  == 2 and GETRANDOMNUMBER(1)  < 35) then
+                                                        SETPLAYGROUP(COCTIME)
+                                                        return
+                                                end
+                                        end
+                                end
+                        elseif(GETDEFPLAYGROUP(CDPUNTRETURN) or GETDEFPLAYGROUP(CDPUNTRETURNSAFE) or GETDEFPLAYGROUP(CDPUNTRETURNBLOCK) or GETDEFPLAYGROUP(CDFGBLOCK)) then
+                                -- calling blocks when not needed
+                                if (GETDOWN()  < 4 and GETQUARTER()  < 4) then  --First 3 quarters and always call CO3RDLONG when the defense lines up an a block
+                                        SETPLAYGROUP(CO3RDLONG)
+                                        return
+                                end
+                                if (GETDOWN()  < 4 and GETQUARTER()  == 4 and GETSCOREDIFF()  <= 0) then  -- In the 4th quarter and don't throw it if you're winning
+                                        SETPLAYGROUP(CO3RDLONG)
+                                        return
+                                end
+                        end
+                end
+        end
+
+        if (GETFKICKOFF() == 1 and GETQUARTER()  == 4) then
+                -- if kickoff check for audible
+                if(GETOFFPLAYGROUP(COKICKOFFONSIDE)) then
+                else
+                        if (GETYARDSTOENDZONE()  > 25 and GETTIMEREMAINING()  <= 300 and GETTIMEREMAINING()  >= 210 and GETSCOREDIFF()  <= -17) then
+                                SETPLAYGROUP(COKICKOFFONSIDE)
+                                return
+                        end
+                        if (GETYARDSTOENDZONE()  > 25 and GETTIMEREMAINING()  <= 210 and GETTIMEREMAINING()  >= 120 and GETSCOREDIFF()  <= -9) then
+                                SETPLAYGROUP(COKICKOFFONSIDE)
+                                return
+                        end
+                        if (GETYARDSTOENDZONE()  > 25 and GETTIMEREMAINING()  <= 120 and GETSCOREDIFF()  < 0) then
+                                SETPLAYGROUP(COKICKOFFONSIDE)
+                                return
+                        end
+                end
+        end
+end
+
+
+
+
+
+
+

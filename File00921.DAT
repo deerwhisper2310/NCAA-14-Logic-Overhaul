@@ -1,0 +1,180 @@
+
+function DefensiveAudible()
+        if (GETFKICKOFF() == 0) then
+                if (GETFNOHUDDLE()  == 1) then
+                        if (GETYARDSTOENDZONE()  <= 4) then
+                                SETPLAYGROUP(CDGOALLINE)
+                                return
+                        end
+                        if (GETDOWN()  <= 2 and GETDISTANCETO1ST()  >= 10) then
+                                SETPLAYGROUP(CDPASS)
+                                return
+                        end
+                        if (GETDOWN()  <= 2 and GETRANDOMNUMBER(1)  <= 50) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        end
+                        if (GETDOWN()  <= 2) then
+                                SETPLAYGROUP(CDPASS)
+                                return
+                        end
+                        if (GETDOWN()  == 3 and GETDISTANCETO1ST()  < 4) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        end
+                        if (GETDOWN()  == 3) then
+                                SETPLAYGROUP(CDNICKEL)
+                                return
+                        end
+                        if (GETDISTANCETO1ST() < 4) then
+                                SETPLAYGROUP(CDRUN)
+                                return
+                        end
+                        SETPLAYGROUP(CDDIME)
+                        return
+                end
+
+                -- Not No Huddle
+				
+				if(((GETQUARTER() <= 2 and GETTIMEREMAININGHALF() > 120) or (GETQUARTER() >= 3 and GETTIMEREMAININGHALF() > 210) or GETQUARTER() >= 5) and GETYARDSTOENDZONE() < 95 and GETYARDSTOENDZONE() > 4) then -- no audibles inside 2 minutes in 1st half or 3.5 minutes in 2nd half, or near either goal line, to avoid conflicts with playcalling logic
+					
+					if(GETDOWN() == 1 or GETDOWN() == 2) then -- Random 1st/2nd down audible
+						if(GETRANDOMNUMBER(1)  <= 1) then
+							SETPLAYGROUP(CDPASS)
+							return
+						end
+						if(GETRANDOMNUMBER(1)  <= 2) then
+							SETPLAYGROUP(CDRUN)
+							return
+						end
+					end
+				
+				end
+				
+                if(GETOFFPLAYGROUP(COPUNT) or GETOFFPLAYGROUP(COPUNTMAXPROTECT)) then
+                        if (GETDOWN()  == 4) then  -- Offense is lining up in a punt
+                                if(GETDEFPLAYGROUP(CDPUNTRETURN) or GETDEFPLAYGROUP(CDPUNTRETURNBLOCK) or GETDEFPLAYGROUP(CDPUNTRETURNSAFE)) then
+                                else
+                                        if (GETYARDSTOENDZONE()  >= 35) then  -- Offense is lining up in a punt and they're on or outside the 35 - audible into return
+                                                SETPLAYGROUP(CDPUNTRETURN)
+                                                return
+                                        end
+                                end
+                        end
+                        if (GETDOWN() ~= 4) then  -- Offense is lining up in a punt when it's not 4th down - assume it is a fake
+                                if(GETDEFPLAYGROUP(CDNORM) or GETDEFPLAYGROUP(CDRUN) or GETDEFPLAYGROUP(CDPASS) or GETDEFPLAYGROUP(CDNICPASS)) then
+                                else
+                                        SETPLAYGROUP(CDNORM)
+                                        return  -- It's not 4th down so we're assuming this is a fake
+                                end
+                        end
+                elseif(GETOFFPLAYGROUP(COPUNTFAKEPUNT)) then
+                        if (GETDOWN() ~= 4) then  -- Offense is lining up in a punt
+                                if(GETDEFPLAYGROUP(CDNORM) or GETDEFPLAYGROUP(CDRUN) or GETDEFPLAYGROUP(CDPASS) or GETDEFPLAYGROUP(CDNICPASS)) then
+                                else
+                                        SETPLAYGROUP(CDNORM)
+                                        return  -- It's not 4th down so we're assuming this is a fake
+                                end
+                        end
+                elseif(GETOFFPLAYGROUP(COFG) or GETOFFPLAYGROUP(COGOFOR1) or GETOFFPLAYGROUP(COFGFAKEFG)) then
+                        if(GETOFFPLAYGROUP(COFG) or GETOFFPLAYGROUP(COGOFOR1)) then
+                                if(GETDEFPLAYGROUP(CDFGBLOCK) or GETDEFPLAYGROUP(CDFGSAFE) or GETDEFPLAYGROUP(CDFGRETURN)) then
+                                    return -- we're done here
+                                end
+                        end
+
+                        if (GETFPAT()  == 1) then  -- Offense is lining up in a FG set on the PAT
+                                if(GETDEFPLAYGROUP(CDFGSAFE)) then
+                                else
+                                        SETPLAYGROUP(CDFGSAFE)
+                                        return
+                                end
+                        end
+                        if (GETDOWN()  == 4) then  -- Offense is lining up in a FG set on 4th down
+                                if(GETDEFPLAYGROUP(CDFGSAFE)) then
+                                else
+                                        if (GETYARDSTOENDZONE()  <= 37) then  -- They're in FG range so we need to line up in a FG defense so it doesn't look like we're cheating
+                                                SETPLAYGROUP(CDFGSAFE)
+                                                return
+                                        end
+                                end
+                        end
+                        if (GETDOWN()  < 4 and GETFPAT()   == 0) then  -- It's not 4th down so we're assuming this is a fake
+                                SETPLAYGROUP (CDNORM)
+                                return
+                        end
+                else
+                        if(ISOFFENSIVEPLAYAPASS()) then
+                                if(GETOFFFORMATION() == SET_4WR) then
+                                        if(GETDEFPLAYGROUP(CDNICPASS) or GETDEFPLAYGROUP(CDDIME) or GETDEFPLAYGROUP(CDTRIPSPASS)) then
+                                        else
+                                                SETPLAYGROUP(CDNICPASS)
+                                                return
+                                        end
+                                elseif(GETOFFFORMATION()  == SET_TRIPS) then
+                                        if(GETDEFPLAYGROUP(CDNICPASS) or GETDEFPLAYGROUP(CDDIME) or GETDEFPLAYGROUP(CDTRIPSPASS)) then
+                                        else
+                                                SETPLAYGROUP(CDTRIPSPASS)
+                                                return
+                                        end
+                                end
+                        end
+                        -- fall through to default case
+
+                        if(GETDEFPLAYGROUP(CDPUNTRETURNBLOCK) or GETDEFPLAYGROUP(CDPUNTRETURNSAFE) or GETDEFPLAYGROUP(CDPUNTRETURN)) then  -- we're in punt return and switch out because they aren't punting
+                                if (GETDISTANCETO1ST()  <= 3) then
+                                        SETPLAYGROUP(CDGOALLINE)
+                                        return
+                                end
+                                SETPLAYGROUP(CDNICKEL)
+                                return
+                        elseif(GETDEFPLAYGROUP(CDFGSAFE) or GETDEFPLAYGROUP(CDFGBLOCK)) then  -- we're in Field goal block and switch out because they aren't kicking
+                                SETPLAYGROUP(CDNORM)
+                                return
+                        elseif(GETDEFPLAYGROUP(CDGOALRUN)) then
+                                -- we're in goalline run and make sure they are still in a run play and otherwise change
+                                if(ISOFFENSIVEPLAYAPASS()) then
+                                        if(GETOFFFORMATION() == SET_NORMAL) then
+                                                SETPLAYGROUP(CDGOALPASS)
+                                                return
+                                        elseif(GETOFFFORMATION() == SET_JUMBO) then
+                                                SETPLAYGROUP(CDGOALPASS)
+                                                return
+                                        elseif(GETOFFFORMATION() == SET_3WR) then
+                                                SETPLAYGROUP(CDPASS)
+                                                return
+                                        elseif(GETOFFFORMATION() == SET_4WR) then
+                                                SETPLAYGROUP(CDNICPASS)
+                                                return
+                                        elseif(GETOFFFORMATION() == SET_BIG) then
+                                                SETPLAYGROUP(CDPASS)
+                                                return
+                                        elseif(GETOFFFORMATION() == SET_TRIPS) then
+                                                SETPLAYGROUP(CDTRIPSPASS)
+                                                return
+                                        end
+                                end
+                        end
+                end
+        end
+
+        if (GETFKICKOFF() == 1) then
+                if(GETOFFPLAYGROUP(COKICKOFFONSIDE)) then
+                        if(not GETDEFPLAYGROUP(CDKICKOFFRETURNONSIDE)) then
+                                SETPLAYGROUP(CDKICKOFFRETURNONSIDE)
+                                return
+                        end
+                elseif(GETOFFPLAYGROUP(COKICKOFF)) then
+                        if(GETDEFPLAYGROUP(CDKICKOFFRETURNONSIDE)) then
+                                SETPLAYGROUP(CDKICKOFFRETURN)
+                                return
+                        end
+                elseif(GETOFFPLAYGROUP(COSQUIB)) then
+                        if(GETDEFPLAYGROUP(CDKICKOFFRETURNONSIDE)) then
+                                SETPLAYGROUP(CDKICKOFFRETURN)
+                                return
+                        end
+                end
+        end
+end
+
