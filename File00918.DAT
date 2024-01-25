@@ -13,7 +13,7 @@ function OffensiveTimeOut()
 				end
 			end
 			if (GETQUARTER()  == 4) then
-				if (GETSCOREDIFF()  < 0 and GETSCOREDIFF()  >= -24) then  -- This is the TIMEOUT to set up last second play
+				if (GETSCOREDIFF()  < 0 and GETSCOREDIFF()  >= -16) then  -- This is the TIMEOUT to set up last second play
 					SETPLAY(TIMEOUT)
 					return
 				end
@@ -23,17 +23,46 @@ function OffensiveTimeOut()
 				end
 			end
 		end
+		
 		if (GETTIMEREMAININGHALF()  <= 4) then  -- OK and we didn't have any TIMEOUTs left - SNAP the ball with 0:04 remaining
 			if(GETDEFOFFSETTYPE() == PT_HAILMARY or GETDEFOFFSETTYPE() == PT_FG or GETDEFOFFSETTYPE() == PT_STOPCLOCK) then
 				SETPLAY(SNAPBALL)
 				return
 			end
 		end
+		
+		if (GETDEFOFFSETTYPE() == PT_STOPCLOCK and GETYARDSTOENDZONE() <= Offense_DetermineKickersRange() and GETTIMEREMAININGHALF() <= 12 and GETOFFTIMEOUTS() == 0) then
+			if (GETQUARTER() == 2) then
+				SETPLAY(SLOWUP)
+				return
+			end
+			if (GETQUARTER() == 4) then
+				if (GETSCOREDIFF() <= 0 and GETSCOREDIFF() >= -3) then
+					SETPLAY(SLOWUP)
+					return
+				end	
+			end			
+		end
+		
 		if (GETQUARTER()  == 1 and GETTIMEREMAININGQUARTER()  <= 15) then  -- First GETQUARTER()  - try to hurry and get the play off if we can
 			SETPLAY(HURRYUPTOLINE)
 			return
 		end
-		if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  <= 120) then  -- First Half Time management will only come into play in the last 2 minutes
+		
+		if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  <= 240 and GETTIMEREMAININGHALF() > 120) then  -- First Half Time management will start to come into play in the last 4 minutes
+			if (GETTIMEREMAININGHALF() <= 180) then  -- slowup on special teams plays, dont give them more time with the ball than necessary
+				if(GETDEFOFFSETTYPE() == PT_KNEEL or GETDEFOFFSETTYPE() == PT_PUNT or GETDEFOFFSETTYPE() == PT_FAKEPUNT or GETDEFOFFSETTYPE() == PT_FAKEFG or GETDEFOFFSETTYPE() == PT_FG) then
+					SETPLAY(SLOWUP)
+					return
+				end			
+			end 
+			if (GETYARDSTOENDZONE() <= Offense_DetermineKickersRange()) then  -- in scoring range so go ahead and start chewing clock, eat up as much time as you can
+				SETPLAY(SLOWUP)
+				return
+			end
+		end
+		
+		if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  <= 120) then
 			if(GETDEFOFFSETTYPE() == PT_KNEEL or GETDEFOFFSETTYPE() == PT_PUNT or GETDEFOFFSETTYPE() == PT_FAKEPUNT or GETDEFOFFSETTYPE() == PT_FAKEFG or GETDEFOFFSETTYPE() == PT_FG) then
 				SETPLAY(SLOWUP)
 				return
@@ -77,11 +106,6 @@ function OffensiveTimeOut()
 					if (GETYARDSTOENDZONE()  > 80) then  -- We'd better just play it safe in this situation
 						SETPLAY(SLOWUP)
 						return
-					end
-					
-					if (GETYARDSTOENDZONE() < 65 and GETYARDSTOENDZONE() > 28 and GETDISTANCETO1ST() < 10 and GETTIMEREMAININGHALF() < 80 and GETOFFTIMEOUTS() == 3) then  -- 3 timeouts and a critical 3rd down, use one
-						SETPLAY(TIMEOUT)
-						return
 					end					
 					
 					-- If we're between the 20's(ish), use regular time management
@@ -118,7 +142,7 @@ function OffensiveTimeOut()
 							SETPLAY(TIMEOUT)
 							return
 						end
-						if (GETOFFTIMEOUTS() >= 2 and GETPLAYCLOCKREMAINING()  >= 24 and GETYARDSTOENDZONE()  > 10 and GETTIMEREMAININGHALF() < 40) then  -- We've got 2+ TIMEOUTs - call one if outside their 10 and under 0:40
+						if (GETOFFTIMEOUTS() >= 2 and GETPLAYCLOCKREMAINING()  >= 24 and GETYARDSTOENDZONE()  > 10 and GETTIMEREMAININGHALF() < 30) then  -- We've got 2+ TIMEOUTs - call one if outside their 10 and under 0:30
 							SETPLAY(TIMEOUT)
 							return
 						end						
@@ -213,10 +237,30 @@ function OffensiveTimeOut()
 						SETPLAY(SLOWUP)
 						return
 					end
-					if (GETYARDSTOENDZONE()  <= 70) then  -- We're past our own 30
-						if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24) then  -- We've got 1+ TIMEOUTs, call one
-							SETPLAY(TIMEOUT)
-							return
+					if (GETYARDSTOENDZONE()  < 70) then  -- We're past our own 30
+						if (GETDOWN() == 1) then
+							if (GETOFFTIMEOUTS() >= 2 and GETTIMEREMAININGHALF() <= 12) then
+								SETPLAY(TIMEOUT)
+								return
+							end
+							if (GETOFFTIMEOUTS() >= 1 and GETTIMEREMAININGHALF() <= 7) then
+								SETPLAY(TIMEOUT)
+								return
+							end	
+							SETPLAY(HURRYUPTOLINE)
+							return  -- Spike the Ball!							
+						end						
+						if (GETDOWN() == 2) then
+							if (GETOFFTIMEOUTS() >= 2) then
+								SETPLAY(TIMEOUT)
+								return
+							end
+							if (GETOFFTIMEOUTS() >= 1 and GETTIMEREMAININGHALF() <= 8) then
+								SETPLAY(TIMEOUT)
+								return
+							end	
+							SETPLAY(HURRYUPTOLINE)
+							return  -- Spike the Ball!								
 						end
 						SETPLAY(HURRYUPTOLINE)
 						return  -- Spike the Ball!
@@ -228,7 +272,7 @@ function OffensiveTimeOut()
 						return
 					end
 					if (GETYARDSTOENDZONE()  < 70) then  -- We're past our 30
-						if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24) then  -- If we've got 1+ TIMEOUTs, call one
+						if (GETOFFTIMEOUTS() >= 1 and GETTIMEREMAININGHALF()  <= 8) then  -- If we've got 1+ TIMEOUTs, call one
 							SETPLAY(TIMEOUT)
 							return
 						end
@@ -265,8 +309,8 @@ function OffensiveTimeOut()
 					return
 				end
 			end			
-			if (GETTIMEREMAINING()  < 420 and GETTIMEREMAINING()  >= 330) then  -- 7:00 - 5:30 left in game (start slowing down or hurrying up)
-				if (GETSCOREDIFF()  <= -17) then  -- down by 17+, start hurrying up
+			if (GETTIMEREMAINING()  >= 330) then  -- 7:00 - 5:30 left in game (start slowing down or hurrying up)
+				if (GETSCOREDIFF()  <= -9) then  -- down by 9+, start hurrying up
 					SETPLAY(HURRYUPTOLINE)
 					return
 				end			
@@ -276,11 +320,11 @@ function OffensiveTimeOut()
 				end
 			end
 			if (GETTIMEREMAINING()  < 330 and GETTIMEREMAINING()  >= 240) then  -- 5:30 - 4:00 left in game (start slowing down or hurrying up)
-				if (GETSCOREDIFF()  <= -9) then  -- down by 9+, start hurrying up
+				if (GETSCOREDIFF()  <= -9 or (GETSCOREDIFF() <= -8 and GETTIMEREMAINING() < 285)) then  -- down by 9+, or down by 8+ with under 4:45, start hurrying up
 					SETPLAY(HURRYUPTOLINE)
 					return
 				end
-				if (GETSCOREDIFF()  >= 9 or (GETSCOREDIFF() >= 7 and GETTIMEREMAINING() < 285)) then  -- Up by 9+, or up by 7+ with under 4:45, start slowing down
+				if (GETSCOREDIFF()  >= 9 or (GETSCOREDIFF() >= 4 and GETTIMEREMAINING() < 285)) then  -- Up by 9+, or up by 4+ with under 4:45, start slowing down
 					SETPLAY(SLOWUP)
 					return
 				end
@@ -290,6 +334,14 @@ function OffensiveTimeOut()
 					SETPLAY(HURRYUPTOLINE)
 					return
 				end
+				if (GETSCOREDIFF() <= -4 and GETSCOREDIFF()  >= -7 and GETYARDSTOENDZONE() <= 15) then  -- down by 4-7, start slowing down near the endzone 
+					SETPLAY(SLOWUP)
+					return
+				end				
+				if (GETSCOREDIFF() <= 0 and GETSCOREDIFF()  >= -3 and GETYARDSTOENDZONE() <= Offense_DetermineKickersRange()) then  -- FG takes the lead or ties, start slowing down in scoring range
+					SETPLAY(SLOWUP)
+					return
+				end					
 				if (GETSCOREDIFF()  >= 1) then  -- Winning, start slowing down
 					SETPLAY(SLOWUP)
 					return
@@ -344,7 +396,11 @@ function OffensiveTimeOut()
 					SETPLAY(HURRYUPTOLINE)
 					return
 				end	
-				if (GETSCOREDIFF() == -3) then  -- Losing (need a FG to TIE) - Hurry up			
+				if (GETSCOREDIFF() == -3) then  -- Losing (need a FG to TIE) - Hurry up	
+					if (GETDOWN() == 4 and GETDEFOFFSETTYPE() == PT_FG) then  -- 4th down and lined up for a FG, run the clock (hopefully you dont miss)
+						SETPLAY(SLOWUP)
+						return
+					end						
 					if (GETYARDSTOENDZONE() <= (Offense_DetermineKickersRange()-4)) then  -- We're in FG range
 						if (GETOFFTIMEOUTS() >= 2 and GETPLAYCLOCKREMAINING()  >= 24 and GETTIMEREMAINING() < 40 and (GETDOWN() == 2 or GETDOWN() == 3)) then  -- If we've got 2+ TIMEOUTs and call one on 2nd/3rd down under 0:40
 							SETPLAY(TIMEOUT)
@@ -357,14 +413,18 @@ function OffensiveTimeOut()
 						SETPLAY(TIMEOUT)
 						return
 					end
-					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24 and GETDOWN() >= 3 and GETDISTANCETO1ST() >= 7 and GETTIMEREMAINING() < 35) then  -- If we've got 1+ TIMEOUTs and call one on 3rd/4th and long (not in FG range, under 0:35)
+					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24 and GETDOWN() == 4 and GETDISTANCETO1ST() >= 7 and GETTIMEREMAINING() < 35) then  -- If we've got 1+ TIMEOUTs and call one on 4th and long (not in FG range, under 0:35)
 						SETPLAY(TIMEOUT)
 						return
 					end					
 					SETPLAY(HURRYUPTOLINE)
 					return
 				end				
-				if (GETSCOREDIFF()  == -1 or GETSCOREDIFF() == -2) then  -- Losing (need a FG to WIN) - Hurry up			
+				if (GETSCOREDIFF()  == -1 or GETSCOREDIFF() == -2) then  -- Losing (need a FG to WIN) - Hurry up
+					if (GETDOWN() == 4 and GETDEFOFFSETTYPE() == PT_FG) then  -- 4th down and lined up for a FG, run the clock (hopefully you dont miss)
+						SETPLAY(SLOWUP)
+						return
+					end				
 					if (GETYARDSTOENDZONE() <= (Offense_DetermineKickersRange()-4)) then  -- We're in FG range
 						if (GETYARDSTOENDZONE() <= 18) then  -- We're in safe range, no timeouts
 							if (GETDOWN() >= 2) then  -- Hurry to the line after 1st down
@@ -391,7 +451,7 @@ function OffensiveTimeOut()
 						SETPLAY(TIMEOUT)
 						return
 					end
-					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24 and GETDOWN() >= 3 and GETDISTANCETO1ST() >= 7 and GETTIMEREMAINING() < 35) then  -- If we've got 1+ TIMEOUTs and call one on 3rd/4th and long (not in FG range, under 0:35)
+					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24 and GETDOWN() == 4 and GETDISTANCETO1ST() >= 7 and GETTIMEREMAINING() < 35) then  -- If we've got 1+ TIMEOUTs and call one on 4th and long (not in FG range, under 0:35)
 						SETPLAY(TIMEOUT)
 						return
 					end					
@@ -399,6 +459,10 @@ function OffensiveTimeOut()
 					return
 				end
 				if (GETSCOREDIFF()  == 0) then  -- Tied - Hurry up if we're past our own 15
+					if (GETDOWN() == 4 and GETDEFOFFSETTYPE() == PT_FG) then  -- 4th down and lined up for a FG, run the clock (hopefully you dont miss)
+						SETPLAY(SLOWUP)
+						return
+					end				
 					if (GETYARDSTOENDZONE()  >= 85 and GETOFFCOACHAGGRESSIVENESS()  <= 80) then  -- We're inside our own 15 and we have to play this safe
 						SETPLAY(SLOWUP)
 						return
@@ -448,7 +512,7 @@ function OffensiveTimeOut()
 							SETPLAY(TIMEOUT)
 							return
 						end
-						if (GETOFFTIMEOUTS() == 1 and GETTIMEREMAINING() <= 16) then
+						if (GETOFFTIMEOUTS() == 1 and GETTIMEREMAINING() <= 7) then
 							SETPLAY(TIMEOUT)
 							return
 						end						
@@ -465,6 +529,10 @@ function OffensiveTimeOut()
 						SETPLAY(HURRYUPTOLINE)
 						return						
 					end
+					if (GETDOWN() == 4 and GETDEFOFFSETTYPE() == PT_FG and GETSCOREDIFF() >= -3) then  -- 4th down and lined up for a FG, run the clock (hopefully you dont miss)
+						SETPLAY(SLOWUP)
+						return
+					end					
 					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24) then  -- If we've got 1+ TIMEOUTs and call one (not in FG range)
 						if (GETOFFTIMEOUTS() == 3) then
 							SETPLAY(TIMEOUT)
@@ -479,8 +547,14 @@ function OffensiveTimeOut()
 							return
 						end
 						if (GETOFFTIMEOUTS() == 1 and GETTIMEREMAINING() <= 13) then
-							SETPLAY(TIMEOUT)
-							return
+							if (GETDOWN() >= 2) then
+								SETPLAY(TIMEOUT)
+								return
+							end
+							if (GETDOWN() == 1 and GETTIMEREMAINING() <= 7) then
+								SETPLAY(TIMEOUT)
+								return
+							end							
 						end		
 						SETPLAY(HURRYUPTOLINE)
 						return						
@@ -501,6 +575,10 @@ function OffensiveTimeOut()
 						SETPLAY(HURRYUPTOLINE)
 						return						
 					end
+					if (GETDOWN() == 4 and GETDEFOFFSETTYPE() == PT_FG) then  -- 4th down and lined up for a FG, run the clock (hopefully you dont miss)
+						SETPLAY(SLOWUP)
+						return
+					end					
 					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24) then  -- If we've got 1+ TIMEOUTs and call one (not in FG range)
 						if (GETYARDSTOENDZONE() < 75 and GETOFFTIMEOUTS() == 3) then
 							SETPLAY(TIMEOUT)
@@ -533,9 +611,15 @@ function OffensiveTimeOut()
 					return
 				end			
 				if (GETSCOREDIFF()  <= -4) then  -- Losing (Need TD+) - Hurry up
-					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24) then  -- If we've got 1+ TIMEOUTs and call one
-						SETPLAY(TIMEOUT)
-						return					
+					if (GETOFFTIMEOUTS() >= 1) then  -- If we've got 1+ TIMEOUTs and call one
+						if (GETDOWN() >= 2) then
+							SETPLAY(TIMEOUT)
+							return
+						end
+						if (GETDOWN() == 1 and GETTIMEREMAINING() <= 7) then
+							SETPLAY(TIMEOUT)
+							return
+						end					
 					end
 					SETPLAY(HURRYUPTOLINE)
 					return
@@ -553,9 +637,15 @@ function OffensiveTimeOut()
 						SETPLAY(HURRYUPTOLINE)
 						return						
 					end
-					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24) then  -- If we've got 1+ TIMEOUTs and call one (not in FG range)
-						SETPLAY(TIMEOUT)
-						return
+					if (GETOFFTIMEOUTS() >= 1) then  -- If we've got 1+ TIMEOUTs and call one (not in FG range)
+						if (GETDOWN() >= 2) then
+							SETPLAY(TIMEOUT)
+							return
+						end
+						if (GETDOWN() == 1 and GETTIMEREMAINING() <= 7) then
+							SETPLAY(TIMEOUT)
+							return
+						end	
 					end
 					SETPLAY(HURRYUPTOLINE)
 					return
@@ -582,8 +672,14 @@ function OffensiveTimeOut()
 						return						
 					end
 					if (GETOFFTIMEOUTS() >= 1 and GETDOWN() < 4) then
-						SETPLAY(TIMEOUT)
-						return
+						if (GETDOWN() >= 2) then
+							SETPLAY(TIMEOUT)
+							return
+						end
+						if (GETDOWN() == 1 and GETTIMEREMAINING() <= 7) then
+							SETPLAY(TIMEOUT)
+							return
+						end	
 					end
 					if (GETOFFTIMEOUTS() >= 1 and GETPLAYCLOCKREMAINING()  >= 24 and GETDOWN() == 4 and GETYARDSTOENDZONE() <= 50) then  -- If we've got 1+ TIMEOUTs and call one (not in FG range)
 						SETPLAY(TIMEOUT)

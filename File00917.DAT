@@ -3,14 +3,21 @@
 function OffensiveAudible()
         if (GETFKICKOFF() == 0) then
                 if (GETFNOHUDDLE() > 1) then  -- NOHUDDLEHURRYUP situations
-						if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  <= 35 and GETTIMEREMAININGHALF()  >= 20 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:20-0:35 REMAINING IN THE 2ND QUARTER with 1 TIMEOUT remaining
-                                if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5) then  -- We're in FG range, but not inside the 5
+						if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  <= 35 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:20-0:35 REMAINING IN THE 2ND QUARTER with 1 TIMEOUT remaining
+                                if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5 and GETTIMEREMAININGHALF()  >= 20) then  -- We're in FG range, but not inside the 5
                                         if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
                                                 SETPLAYGROUP(COSTOPCLOCK)
                                                 return
                                         end
                                 end
-                        end						
+								if (GETTIMEREMAININGHALF() < 20 and GETYARDSTOENDZONE() <= 70) then
+                                        if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
+                                                SETPLAYGROUP(COSTOPCLOCK)
+                                                return
+                                        end
+                                end								
+                        end	
+						
 						if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 30 and GETOFFTIMEOUTS()  == 0) then  -- UNDER 0:30 REMAINING IN THE 2ND QUARTER with no TIMEOUTs remaining
                                 if (GETYARDSTOENDZONE()  <= 40 and GETYARDSTOENDZONE()  > 10) then  -- We're in FG range, but not inside the 10
                                         if (GETDOWN()  < 3) then  -- Spike on 1st / 2nd down
@@ -24,7 +31,11 @@ function OffensiveAudible()
                                 end
                         end
 								if (GETSCOREDIFF()  < 0) then  -- WE'RE LOSING
-										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  <= 30 and GETTIMEREMAININGHALF()  >= 15 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:15-0:30 REMAINING IN THE 4TH QUARTER with 1 TIMEOUT remaining
+										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  <= 30 and GETOFFTIMEOUTS()  == 1) then  -- UNDER 0:30 REMAINING IN THE 4TH QUARTER with 1 TIMEOUT remaining
+												if (GETTIMEREMAININGHALF() <= 12 and GETYARDSTOENDZONE() <= Offense_DetermineKickersRange()) then
+														SETPLAYGROUP(COSTOPCLOCK)
+														return
+												end												
 												if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5) then  -- We're in FG range, but not inside the 5
 														if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
 																SETPLAYGROUP(COSTOPCLOCK)
@@ -33,7 +44,11 @@ function OffensiveAudible()
 												end
 										end								
 										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 35 and GETOFFTIMEOUTS()  == 0) then  -- UNDER 0:35 REMAINING IN THE 4TH QUARTER with no TIMEOUTs remaining
-												if (GETYARDSTOENDZONE()  <= 40) then  -- We're in FG range
+												if (GETTIMEREMAININGHALF() <= 12 and GETYARDSTOENDZONE() <= Offense_DetermineKickersRange()) then
+														SETPLAYGROUP(COSTOPCLOCK)
+														return
+												end												
+												if (GETYARDSTOENDZONE()  <= 40) then  -- We're near FG range
 														if (GETDOWN()  < 3) then  -- Spike on 1st / 2nd down
 																SETPLAYGROUP(COSTOPCLOCK)
 																return
@@ -46,7 +61,11 @@ function OffensiveAudible()
 										end
 								end
 								if (GETSCOREDIFF()  == 0) then  -- WE'RE TIED
-										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  <= 30 and GETTIMEREMAININGHALF()  >= 15 and GETOFFTIMEOUTS()  == 1) then  -- BETWEEN 0:15-0:30 REMAINING IN THE 4TH QUARTER with 1 TIMEOUT remaining
+										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  <= 30 and GETOFFTIMEOUTS()  == 1) then  -- UNDER 0:30 REMAINING IN THE 4TH QUARTER with 1 TIMEOUT remaining
+												if (GETTIMEREMAININGHALF() <= 12 and GETYARDSTOENDZONE() <= Offense_DetermineKickersRange()) then
+														SETPLAYGROUP(COSTOPCLOCK)
+														return
+												end												
 												if (GETYARDSTOENDZONE()  <= 33 and GETYARDSTOENDZONE()  > 5) then  -- We're in FG range, but not inside the 5
 														if (GETDOWN()  == 1) then  -- Spike on 1st down to preserve final TIMEOUT
 																SETPLAYGROUP(COSTOPCLOCK)
@@ -55,6 +74,10 @@ function OffensiveAudible()
 												end
 										end								
 										if (GETQUARTER()  == 4 and GETTIMEREMAININGHALF()  < 35 and GETOFFTIMEOUTS()  == 0) then  -- UNDER 0:35 REMAINING IN THE 4TH QUARTER with no TIMEOUTs remaining
+												if (GETTIMEREMAININGHALF() <= 12 and GETYARDSTOENDZONE() <= Offense_DetermineKickersRange()) then
+														SETPLAYGROUP(COSTOPCLOCK)
+														return
+												end
 												if (GETYARDSTOENDZONE()  <= 40 and GETYARDSTOENDZONE()  > 10) then  -- We're in FG range, but not inside the 10
 														if (GETDOWN()  < 3) then  -- Spike on 1st / 2nd down
 																SETPLAYGROUP(COSTOPCLOCK)
@@ -66,6 +89,24 @@ function OffensiveAudible()
 														return
 												end
 										end
+								end
+								if (GETSCOREDIFF() < 0) then
+									if (GETTIMEREMAINING() < 10) then
+										SETPLAYGROUP(CO3RDLONG)
+										return
+									end	
+									if (GETYARDSTOENDZONE() > 60 and GETTIMEREMAINING() < 15) then
+										SETPLAYGROUP(CO3RDLONG)
+										return
+									end								
+									if (GETYARDSTOENDZONE() > 70 and GETTIMEREMAINING() < 20) then
+										SETPLAYGROUP(CO3RDLONG)
+										return
+									end	
+									if (GETYARDSTOENDZONE() > 80 and GETTIMEREMAINING() < 25) then
+										SETPLAYGROUP(CO3RDLONG)
+										return
+									end	
 								end	
 								SETPLAYGROUP(COCTIME)
 								return
@@ -77,7 +118,7 @@ function OffensiveAudible()
 				if(((GETQUARTER() <= 2 and GETTIMEREMAININGHALF() > 120) or (GETQUARTER() >= 3 and GETTIMEREMAININGHALF() > 240) or GETQUARTER() >= 5) and GETYARDSTOENDZONE() < 95 and GETYARDSTOENDZONE() > 4) then -- no audibles inside 2 minutes in 1st half or 4 minutes in 2nd half, or near either goal line, to avoid conflicts with playcalling logic
 				
 					if(GETDEFPLAYGROUP(CDDIME) or GETDEFPLAYGROUP(CDDIMEPASS)) then -- D has weak box on a running down & distance
-						if(GETRANDOMNUMBER(1)  <= 20) then
+						if(GETRANDOMNUMBER(1)  <= 18) then
 							if(GETDOWN()  == 1 and GETDISTANCETO1ST() <= 10) then
 								SETPLAYGROUP(COWTIME)
 								return
@@ -98,7 +139,7 @@ function OffensiveAudible()
 					end	
 					
 					if((GETDEFPLAYGROUP(CDRUN) or GETDEFPLAYGROUP(CDNICRUN) or GETDEFPLAYGROUP(CDTRIPSRUN))) then -- D calls blitz/run formation, audible to quick pass
-						if(GETRANDOMNUMBER(1)  <= 10) then
+						if(GETRANDOMNUMBER(1)  <= 9) then
 							if(GETDISTANCETO1ST() > 1) then
 								if(GETDOWN()  <= 2) then
 									SETPLAYGROUP(COCTIME)
@@ -117,14 +158,14 @@ function OffensiveAudible()
 					end
 					
 					if(GETDOWN() == 1 or GETDOWN() == 2) then -- Random 1st/2nd down audible
-						if(GETRANDOMNUMBER(1)  >= 98) then
+						if(GETRANDOMNUMBER(1)  >= 99) then
 							SETPLAYGROUP(COFIRSTDOWN)
 							return
 						end
 					end
 	
 					if(GETDOWN()  == 3) then -- Random 3rd down audible
-						if(GETRANDOMNUMBER(1)  >= 98) then
+						if(GETRANDOMNUMBER(1)  >= 99) then
 							if(GETDISTANCETO1ST() <= 2) then
 								SETPLAYGROUP(COFIRSTDOWN)
 								return
@@ -162,11 +203,11 @@ function OffensiveAudible()
                                 -- calling goal line when not needed
                                 if (GETTIMEREMAINING() > 180 and GETSCOREDIFF()  <= 0) then
                                         if (GETYARDSTOENDZONE()  > 12) then
-                                                if (GETDOWN()  == 1 and GETRANDOMNUMBER(1)  < 35) then
+                                                if (GETDOWN()  == 1 and GETRANDOMNUMBER(1)  < 70) then
                                                         SETPLAYGROUP(COCTIME)
                                                         return
                                                 end
-                                                if (GETDOWN()  == 2 and GETRANDOMNUMBER(1)  < 35) then
+                                                if (GETDOWN()  == 2 and GETRANDOMNUMBER(1)  < 70) then
                                                         SETPLAYGROUP(COCTIME)
                                                         return
                                                 end

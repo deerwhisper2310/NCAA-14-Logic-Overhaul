@@ -36,15 +36,15 @@ function DefensivePlay()
                         end        
                 elseif(GETOFFFORMATION() == SET_3WR) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         end
                 elseif(GETOFFFORMATION()  == SET_4WR) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
                                 SETPLAYGROUP(CDNORM)
@@ -52,15 +52,15 @@ function DefensivePlay()
                         end
                 elseif(GETOFFFORMATION()  == SET_TRIPS) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         end
                 elseif(GETOFFFORMATION()  == SET_EMPTY) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
                                 SETPLAYGROUP(CDNORM)
@@ -68,10 +68,10 @@ function DefensivePlay()
                         end 
                 elseif(GETOFFFORMATION()  == SET_BUNCH) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDNORM)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         end        
 

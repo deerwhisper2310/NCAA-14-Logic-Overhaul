@@ -819,13 +819,13 @@ function OffensivePlay()
                         return
                     end
                 end
-                if (GETTIMEREMAININGQUARTER() < 330 and GETTIMEREMAININGQUARTER()  >= 240 and GETSCOREDIFF()  <= -9) then  -- Between 5:30 and 4:00 remaining in the game (Better hurry up on 1st down if we're down by 2+ possessions)
+                if (GETTIMEREMAININGQUARTER() < 330 and GETTIMEREMAININGQUARTER()  >= 150 and GETSCOREDIFF()  <= -9) then  -- Between 5:30 and 2:30 remaining in the game (Better hurry up on 1st down if we're down by 2+ possessions)
                     if (GETDOWN()  == 1) then
                         SETPLAY(NOHUDDLEHURRYUP)
                         return
                     end
                 end
-				if (GETTIMEREMAININGQUARTER()  <= 240 and GETTIMEREMAININGQUARTER()  >= 120 and GETSCOREDIFF()  <= -9) then  -- Between 4:00 and 2:00 remaining in the game (Better hurry up if we're down by 2+ possessions)
+				if (GETTIMEREMAININGQUARTER()  < 150 and GETTIMEREMAININGQUARTER()  >= 120 and GETSCOREDIFF()  <= -9) then  -- Between 2:30 and 2:00 remaining in the game (Better hurry up on 1st/2nd if we're down by 2+ possessions)
                     if (GETDOWN()  < 3) then
                         SETPLAY(NOHUDDLEHURRYUP)
                         return
@@ -971,54 +971,6 @@ function OffensivePlay()
                 end
             end
         end
-
-        
-        -- The following section determines when you should run no-huddle as a strategic option - RCM 1/20/10
-        -- Only check for No Huddle Offense if not already in No Huddle (fall through to pick a play otherwise)
-        -- We don't want teams running no-huddle if the clock is not running.
-        -- If it's 4th down, don't make this decision here (let normal logic handle it).
-		
-        if (OFFENSERUNSNOHUDDLE() == 2 and GETFNOHUDDLE() == 0 and GETCLOCKISRUNNING() == 1 and GETRANDOMNUMBER(1) <= 50 and GETYARDSTOENDZONE() > 4 and (GETDOWN() == 1 or GETDOWN() == 3 and GETDISTANCETO1ST() <= 1)) then
-            -- For clarity, I've set the logic up slightly different than the norm...
-            -- Let's go ahead and set the play here, and then if we decide that's truly what we want
-            -- to do, return and end processing, otherwise this will just continue on to the logic
-            -- following this section.
-            SETPLAY(NOHUDDLEOFF)
-            if ( GETSCOREDIFF() < 24 -- our lead isn't big enough for us to slow down; no-huddle.
-              or GETQUARTER() < 3 -- we are way ahead, but it's still the first half; no-huddle.
-                -- below: we are way ahead, and it's 3rd quarter, but our coach is aggressive; no-huddle.
-              or (GETQUARTER() == 3 and GETOFFCOACHAGGRESSIVENESS() > 70) ) then
-                return
-            end
-        end
-		
-        if (OFFENSERUNSNOHUDDLE() == 1 and GETFNOHUDDLE() == 0 and GETCLOCKISRUNNING() == 1 and GETRANDOMNUMBER(1) <= 33 and GETYARDSTOENDZONE() > 4 and (GETDOWN() == 1 or GETDOWN() == 3 and GETDISTANCETO1ST() <= 1)) then
-            -- For clarity, I've set the logic up slightly different than the norm...
-            -- Let's go ahead and set the play here, and then if we decide that's truly what we want
-            -- to do, return and end processing, otherwise this will just continue on to the logic
-            -- following this section.
-            SETPLAY(NOHUDDLEOFF)
-            if ( GETSCOREDIFF() < 24 -- our lead isn't big enough for us to slow down; no-huddle.
-              or GETQUARTER() < 3 -- we are way ahead, but it's still the first half; no-huddle.
-                -- below: we are way ahead, and it's 3rd quarter, but our coach is aggressive; no-huddle.
-              or (GETQUARTER() == 3 and GETOFFCOACHAGGRESSIVENESS() > 70) ) then
-                return
-            end
-        end
-		
-        if (OFFENSERUNSNOHUDDLE() == 0 and GETFNOHUDDLE() == 0 and GETCLOCKISRUNNING() == 1 and GETRANDOMNUMBER(1) <= 4 and GETYARDSTOENDZONE() > 4 and (GETDOWN() == 1 or GETDOWN() == 3 and GETDISTANCETO1ST() <= 1)) then
-            -- For clarity, I've set the logic up slightly different than the norm...
-            -- Let's go ahead and set the play here, and then if we decide that's truly what we want
-            -- to do, return and end processing, otherwise this will just continue on to the logic
-            -- following this section.
-            SETPLAY(NOHUDDLEOFF)
-            if ( GETSCOREDIFF() < 24 -- our lead isn't big enough for us to slow down; no-huddle.
-              or GETQUARTER() < 3 -- we are way ahead, but it's still the first half; no-huddle.
-                -- below: we are way ahead, and it's 3rd quarter, but our coach is aggressive; no-huddle.
-              or (GETQUARTER() == 3 and GETOFFCOACHAGGRESSIVENESS() > 70) ) then
-                return
-            end
-        end		
 
         
         -- The following section is the regular play calling section and broken down by quarter
@@ -5144,47 +5096,88 @@ function OffensivePlay()
                 end
             end
         if(GETQUARTER() == 4) then  -- 4th GETQUARTER()
-		
-				if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 1 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 1st down
-					if(GETDEFTIMEOUTS() == 0) then
-						if(GETTIMEREMAININGQUARTER() <= 125) then
-							SETPLAYGROUP(COKNEEL)
-							return
+				if (GETCLOCKISRUNNING() == 1) then  -- clock is running, can call kneel with more time on the clock
+						if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 1 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 1st down
+							if(GETDEFTIMEOUTS() == 0) then
+								if(GETTIMEREMAININGQUARTER() <= 168) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							elseif(GETDEFTIMEOUTS() == 1) then
+								if(GETTIMEREMAININGQUARTER() <= 128) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							elseif(GETDEFTIMEOUTS() == 2) then
+								if(GETTIMEREMAININGQUARTER() <= 88) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							end
 						end
-					elseif(GETDEFTIMEOUTS() == 1) then
-						if(GETTIMEREMAININGQUARTER() <= 95) then
-							SETPLAYGROUP(COKNEEL)
-							return
+						if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 2 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 2nd down
+							if(GETDEFTIMEOUTS() == 0) then
+								if(GETTIMEREMAININGQUARTER() <= 128) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							elseif(GETDEFTIMEOUTS() == 1) then
+								if(GETTIMEREMAININGQUARTER() <= 88) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							end
 						end
-					elseif(GETDEFTIMEOUTS() == 2) then
-						if(GETTIMEREMAININGQUARTER() <= 55) then
-							SETPLAYGROUP(COKNEEL)
-							return
+						if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 3 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 3rd down
+							if(GETDEFTIMEOUTS() == 0) then
+								if(GETTIMEREMAININGQUARTER() <= 88) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							end	
+						end	
+				end		
+				if (GETCLOCKISRUNNING() == 0) then  -- clock isn't running, call kneel with less time on the clock
+						if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 1 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 1st down
+							if(GETDEFTIMEOUTS() == 0) then
+								if(GETTIMEREMAININGQUARTER() <= 128) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							elseif(GETDEFTIMEOUTS() == 1) then
+								if(GETTIMEREMAININGQUARTER() <= 88) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							elseif(GETDEFTIMEOUTS() == 2) then
+								if(GETTIMEREMAININGQUARTER() <= 48) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							end
 						end
-					end
+						if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 2 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 2nd down
+							if(GETDEFTIMEOUTS() == 0) then
+								if(GETTIMEREMAININGQUARTER() <= 88) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							elseif(GETDEFTIMEOUTS() == 1) then
+								if(GETTIMEREMAININGQUARTER() <= 48) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							end
+						end
+						if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 3 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 3rd down
+							if(GETDEFTIMEOUTS() == 0) then
+								if(GETTIMEREMAININGQUARTER() <= 48) then
+									SETPLAYGROUP(COKNEEL)
+									return
+								end
+							end	
+						end	
 				end
-				if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 2 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 2nd down
-					if(GETDEFTIMEOUTS() == 0) then
-						if(GETTIMEREMAININGQUARTER() <= 95) then
-							SETPLAYGROUP(COKNEEL)
-							return
-						end
-					elseif(GETDEFTIMEOUTS() == 1) then
-						if(GETTIMEREMAININGQUARTER() <= 55) then
-							SETPLAYGROUP(COKNEEL)
-							return
-						end
-					end
-				end
-				if (GETYARDSTOENDZONE() <= 96 and GETDOWN() == 3 and GETSCOREDIFF() > 0) then  -- QB Kneel Routines - 3rd down
-					if(GETDEFTIMEOUTS() == 0) then
-						if(GETTIMEREMAININGQUARTER() <= 55) then
-							SETPLAYGROUP(COKNEEL)
-							return
-						end
-					end	
-				end	
-				
                 if (GETTIMEREMAININGQUARTER()  >= 300) then  -- 5:00 or more remaining in the 4th quarter
                         if(GETDOWN() == 1 or GETDOWN() == 2) then  -- 1st & 2nd GETDOWN()
 								if (GETSCOREDIFF() >= -8) then
@@ -5265,8 +5258,8 @@ function OffensivePlay()
                                                 return
                                         end
 										if (GETDISTANCETO1ST()  >= 12 and GETSCOREDIFF() >= -8) then
-											if (GETRANDOMNUMBER(1) <= 4) then
-												SETPLAYGROUP(COWTIME)
+											if (GETRANDOMNUMBER(1) <= 10) then
+												SETPLAYGROUP(COFIRSTDOWN)
 												return
 											end	
 										end										
@@ -5828,6 +5821,18 @@ function OffensivePlay()
                                         SETPLAYGROUP(COGL)
                                         return
                                 end
+                                if (GETSCOREDIFF()  >= 9 and GETSCOREDIFF()  <= 16) then
+									if (GETRANDOMNUMBER(1) < 50) then
+										SETPLAYGROUP(COWTIME)
+										return
+									end
+                                    SETPLAYGROUP(COFIRSTDOWN)
+                                    return									
+                                end	 
+                                if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 32) then 
+										SETPLAYGROUP(COWTIME)
+										return
+                                end								
                                 if (GETYARDSTOENDZONE()  <= 20) then
                                         SETPLAYGROUP(COFIRSTDOWN)
                                         return
@@ -5836,10 +5841,6 @@ function OffensivePlay()
                                         SETPLAYGROUP(COINSIDEFIVE)
                                         return
                                 end
-                                if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 32) then 
-                                    SETPLAYGROUP(COWTIME)
-                                    return
-                                end								
                                 if (GETSCOREDIFF()  <= -17) then 
                                     SETPLAYGROUP(COCTIMESAFE)
                                     return
@@ -5903,7 +5904,7 @@ function OffensivePlay()
                                                 return
                                         end										
                                         if (GETDISTANCETO1ST()  <= 3 or GETSCOREDIFF() >= 9) then
-                                                SETPLAYGROUP(COFIRSTDOWN)
+                                                SETPLAYGROUP(COWTIME)
                                                 return
                                         end
                                         if (GETDISTANCETO1ST()  <= 7) then
@@ -6334,78 +6335,14 @@ function OffensivePlay()
                                 SETPLAYGROUP(COFIRSTDOWN)
                                 return
                             elseif (GETSCOREDIFF()  <= 8) then  -- We're winning by 1 possession, think about running the ball
-								if (GETOFFCOACHAGGRESSIVENESS() >= 85 and GETRANDOMNUMBER(1) <= 30) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 80 and GETRANDOMNUMBER(1) <= 25) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 75 and GETRANDOMNUMBER(1) <= 20) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 70 and GETRANDOMNUMBER(1) <= 15) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 65 and GETRANDOMNUMBER(1) <= 10) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 60 and GETRANDOMNUMBER(1) <= 9) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 55 and GETRANDOMNUMBER(1) <= 8) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 50 and GETRANDOMNUMBER(1) <= 7) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 45 and GETRANDOMNUMBER(1) <= 6) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 40 and GETRANDOMNUMBER(1) <= 5) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 35 and GETRANDOMNUMBER(1) <= 4) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 30 and GETRANDOMNUMBER(1) <= 3) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 25 and GETRANDOMNUMBER(1) <= 2) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() < 20 and GETRANDOMNUMBER(1) <= 1) then
+								if (GETRANDOMNUMBER(1) <= 50) then
 									SETPLAYGROUP(COFIRSTDOWN)
 									return
 								end
                                 SETPLAYGROUP(COWTIME)
                                 return
                             elseif (GETSCOREDIFF() > 8) then
-								if (GETOFFCOACHAGGRESSIVENESS() >= 85 and GETRANDOMNUMBER(1) <= 15) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 80 and GETRANDOMNUMBER(1) <= 10) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 75 and GETRANDOMNUMBER(1) <= 5) then
-									SETPLAYGROUP(COFIRSTDOWN)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() < 75 and GETRANDOMNUMBER(1) <= 1) then
+								if (GETRANDOMNUMBER(1) <= 10) then
 									SETPLAYGROUP(COFIRSTDOWN)
 									return
 								end
@@ -6447,90 +6384,18 @@ function OffensivePlay()
                                     return
                                 end
                             elseif (GETSCOREDIFF()  <= 5) then  -- We're winning by 1 possession (FG doesnt put us up 2 scores) and too early to waste time unless you're very conservative
-								if (GETOFFCOACHAGGRESSIVENESS() >= 85 and GETRANDOMNUMBER(1) <= 25) then
-									SETPLAYGROUP(COWTIME)
+								if (GETRANDOMNUMBER(1) <= 75) then
+									SETPLAYGROUP(COFIRSTDOWN)
 									return
 								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 80 and GETRANDOMNUMBER(1) <= 30) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 75 and GETRANDOMNUMBER(1) <= 35) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 70 and GETRANDOMNUMBER(1) <= 40) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 65 and GETRANDOMNUMBER(1) <= 45) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 60 and GETRANDOMNUMBER(1) <= 50) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 55 and GETRANDOMNUMBER(1) <= 55) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 50 and GETRANDOMNUMBER(1) <= 60) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 45 and GETRANDOMNUMBER(1) <= 65) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 40 and GETRANDOMNUMBER(1) <= 70) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 35 and GETRANDOMNUMBER(1) <= 75) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 30 and GETRANDOMNUMBER(1) <= 80) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 25 and GETRANDOMNUMBER(1) <= 85) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 20 and GETRANDOMNUMBER(1) <= 90) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 15 and GETRANDOMNUMBER(1) <= 95) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() < 15 and GETRANDOMNUMBER(1) <= 99) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-                                SETPLAYGROUP(COFIRSTDOWN)
+                                SETPLAYGROUP(COWTIME)
                                 return
                             elseif (GETSCOREDIFF() > 5) then
-								if (GETOFFCOACHAGGRESSIVENESS() >= 85 and GETRANDOMNUMBER(1) <= 85) then
-									SETPLAYGROUP(COWTIME)
+								if (GETRANDOMNUMBER(1) <= 40) then
+									SETPLAYGROUP(COFIRSTDOWN)
 									return
 								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 80 and GETRANDOMNUMBER(1) <= 90) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() >= 75 and GETRANDOMNUMBER(1) <= 95) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								if (GETOFFCOACHAGGRESSIVENESS() < 75 and GETRANDOMNUMBER(1) <= 99) then
-									SETPLAYGROUP(COWTIME)
-									return
-								end
-								SETPLAYGROUP(COFIRSTDOWN)
+                                SETPLAYGROUP(COWTIME)
                                 return
                             else
                                 SETPLAYGROUP(COFIRSTDOWN)
@@ -6611,6 +6476,10 @@ function OffensivePlay()
                                                     SETPLAYGROUP(COFIRSTDOWN)
                                                     return
                                             end
+											if (GETDISTANCETO1ST()  <= 10 and GETDISTANCETO1ST() > 8 and GETDEFTIMEOUTS() <= 1 and GETOFFCOACHAGGRESSIVENESS() >= 50) then
+													SETPLAYGROUP(COFIRSTDOWN)
+													return
+											end		
                                             SETPLAYGROUP(COWTIME)
                                             return
                                     end
@@ -6619,6 +6488,10 @@ function OffensivePlay()
                                                     SETPLAYGROUP(COFIRSTDOWN)
                                                     return
                                             end
+											if (GETDISTANCETO1ST()  <= 10 and GETDISTANCETO1ST() > 7 and GETDEFTIMEOUTS() <= 1 and GETOFFCOACHAGGRESSIVENESS() >= 60) then
+													SETPLAYGROUP(COFIRSTDOWN)
+													return
+											end											
                                             SETPLAYGROUP(COWTIME)
                                             return
                                     end
@@ -6693,6 +6566,10 @@ function OffensivePlay()
                                                     SETPLAYGROUP(COFIRSTDOWN)
                                                     return
                                             end
+											if (GETDISTANCETO1ST()  <= 10 and GETDISTANCETO1ST() > 8 and GETDEFTIMEOUTS() <= 1 and GETOFFCOACHAGGRESSIVENESS() >= 50) then
+													SETPLAYGROUP(COFIRSTDOWN)
+													return
+											end												
                                             SETPLAYGROUP(COWTIME)
                                             return
                                     end
@@ -6701,6 +6578,10 @@ function OffensivePlay()
                                                     SETPLAYGROUP(COFIRSTDOWN)
                                                     return
                                             end
+											if (GETDISTANCETO1ST()  <= 10 and GETDISTANCETO1ST() > 7 and GETDEFTIMEOUTS() <= 1 and GETOFFCOACHAGGRESSIVENESS() >= 60) then
+													SETPLAYGROUP(COFIRSTDOWN)
+													return
+											end												
                                             SETPLAYGROUP(COWTIME)
                                             return
                                     end
@@ -6953,8 +6834,8 @@ function OffensivePlay()
                                                     SETPLAYGROUP(COGL)
                                                     return
                                             end
-                                            if (GETDISTANCETO1ST()  <= 3) then
-                                                    SETPLAYGROUP(COFIRSTDOWN)
+                                            if (GETDISTANCETO1ST()  <= 2) then
+                                                    SETPLAYGROUP(COWTIME)
                                                     return
                                             end
                                             if (GETDISTANCETO1ST()  <= 9) then
@@ -7581,18 +7462,18 @@ function OffensivePlay()
                                                 return
                                         end										
                                         if (GETDISTANCETO1ST()  <= 3) then
-                                                SETPLAYGROUP(COFIRSTDOWN)
+                                                SETPLAYGROUP(COWTIME)
                                                 return
                                         end
-                                        if (GETDISTANCETO1ST()  <= 7) then
-                                                SETPLAYGROUP(CO3RDLONG)
+                                        if (GETDISTANCETO1ST()  <= 5) then
+                                                SETPLAYGROUP(COFIRSTDOWN)
                                                 return
                                         end
                                         if (GETSCOREDIFF()  > 8 and GETOFFCOACHAGGRESSIVENESS()  <= 70) then  -- I'm pretty conservative so I may settle for a punt with a 2-possession lead
-                                                SETPLAYGROUP(COFIRSTDOWN)
+                                                SETPLAYGROUP(COWTIME)
                                                 return
                                         end
-                                        SETPLAYGROUP(CO3RDLONG)
+                                        SETPLAYGROUP(COFIRSTDOWN)
                                         return  -- Tough spot here and we need to get the first because it's a 1-posession game
                                 end
                                 if (GETYARDSTOENDZONE()  > 39) then  -- We're between the 40 yard lines and not in FG Range yet
@@ -7743,18 +7624,18 @@ function OffensivePlay()
                                         end
                                         -- We're Winning
                                         if (GETDISTANCETO1ST()  <= 5) then
-                                                SETPLAYGROUP(COFIRSTDOWN)
+                                                SETPLAYGROUP(COWTIME)
                                                 return
                                         end
                                         if (GETDISTANCETO1ST()  <= 7) then
-                                                SETPLAYGROUP(CO3RDLONG)
+                                                SETPLAYGROUP(COFIRSTDOWN)
                                                 return
                                         end
                                         if (GETSCOREDIFF()  > 8) then  -- With a 2+ possession lead and let's mix it up
                                                 SETPLAYGROUP(COWTIME)
                                                 return
                                         end
-                                        SETPLAYGROUP(CO3RDLONG)
+                                        SETPLAYGROUP(COFIRSTDOWN)
                                         return  -- We need to get the first because it's a 1-posession game
                                 end
                                 if (GETYARDSTOENDZONE()  >= 4) then  -- We're between the 4 and the 20 yard lines and FG Range and 1:00 - 2:00 left in the game
@@ -7851,8 +7732,8 @@ function OffensivePlay()
                                                         SETPLAYGROUP(COGL)
                                                         return
                                                 end
-                                                if (GETDISTANCETO1ST()  <= 2) then
-                                                        SETPLAYGROUP(COFIRSTDOWN)
+                                                if (GETDISTANCETO1ST()  <= 4) then
+                                                        SETPLAYGROUP(COWTIME)
                                                         return
                                                 end
                                                 if (GETDISTANCETO1ST()  <= 7) then
@@ -7865,7 +7746,7 @@ function OffensivePlay()
                                                 end
                                                 if (GETDISTANCETO1ST()  <= 15) then
                                                         if (GETOFFCOACHAGGRESSIVENESS()  >= 80) then  -- Coach Decision - do we risk throwing the ball here?  Probably not.
-                                                                SETPLAYGROUP(CO3RDLONG)
+                                                                SETPLAYGROUP(COFIRSTDOWN)
                                                                 return
                                                         end
                                                         SETPLAYGROUP(COWTIME)
@@ -7879,13 +7760,13 @@ function OffensivePlay()
                                                         SETPLAYGROUP(COGL)
                                                         return
                                                 end
-                                                if (GETDISTANCETO1ST()  <= 3) then
-                                                        SETPLAYGROUP(COFIRSTDOWN)
+                                                if (GETDISTANCETO1ST()  <= 4) then
+                                                        SETPLAYGROUP(COWTIME)
                                                         return
                                                 end
                                                 if (GETDISTANCETO1ST()  <= 7) then
                                                         if (GETOFFCOACHAGGRESSIVENESS()  >= 65) then  -- Coach Decision - do we risk throwing the ball here? Yes and unless we're very conservative
-                                                                SETPLAYGROUP(CO3RDLONG)
+                                                                SETPLAYGROUP(COFIRSTDOWN)
                                                                 return
                                                         end
                                                         SETPLAYGROUP(COWTIME)
@@ -7899,12 +7780,12 @@ function OffensivePlay()
                                                 return
                                         end
                                         if (GETSCOREDIFF()  <= 5) then  -- We're winning by 4 or 5 (try to convert no matter what)
-                                                if (GETDISTANCETO1ST()  <= 4) then
-                                                        SETPLAYGROUP(COFIRSTDOWN)
+                                                if (GETDISTANCETO1ST()  <= 3) then
+                                                        SETPLAYGROUP(COWTIME)
                                                         return
                                                 end
-                                                if (GETDISTANCETO1ST()  <= 8) then
-                                                        SETPLAYGROUP(CO3RDLONG)
+                                                if (GETDISTANCETO1ST()  <= 7) then
+                                                        SETPLAYGROUP(COFIRSTDOWN)
                                                         return
                                                 end
                                                 SETPLAYGROUP(COWTIME)
@@ -7920,7 +7801,7 @@ function OffensivePlay()
                                                         return
                                                 end
                                                 if (GETDISTANCETO1ST()  <= 7) then
-                                                        if (GETOFFCOACHAGGRESSIVENESS()  >= 70) then  -- Coach Decision - do we risk throwing the ball here?
+                                                        if (GETOFFCOACHAGGRESSIVENESS()  >= 80) then  -- Coach Decision - do we risk throwing the ball here?
                                                                 SETPLAYGROUP(COFIRSTDOWN)
                                                                 return
                                                         end
@@ -7928,7 +7809,7 @@ function OffensivePlay()
                                                         return
                                                 end
                                                 if (GETDISTANCETO1ST()  <= 15) then
-                                                        if (GETOFFCOACHAGGRESSIVENESS()  >= 80) then  -- Coach Decision - do we risk throwing the ball here?
+                                                        if (GETOFFCOACHAGGRESSIVENESS()  >= 85) then  -- Coach Decision - do we risk throwing the ball here?
                                                                 SETPLAYGROUP(COFIRSTDOWN)
                                                                 return
                                                         end
@@ -8721,6 +8602,12 @@ function OffensivePlay()
                                                 SETPLAYGROUP(COKNEEL)
                                                 return
                                         end
+										if (GETDEFTIMEOUTS() > 1 and GETDISTANCETO1ST() >= 5 and GETDISTANCETO1ST() <= 8 and GETYARDSTOENDZONE() < 70) then
+											if (GETOFFCOACHAGGRESSIVENESS() >= 75 or GETRANDOMNUMBER(1) < 10) then
+												SETPLAYGROUP(COFIRSTDOWN)
+												return
+											end
+										end										
                                         SETPLAYGROUP(COWTIME)
                                         return  -- Maybe a real aggressive coach would try to convert this and put it away? Nah.
                                 end
@@ -8778,6 +8665,12 @@ function OffensivePlay()
                                                 SETPLAYGROUP(COKNEEL)
                                                 return
                                         end
+										if (GETDEFTIMEOUTS() > 1 and GETDISTANCETO1ST() >= 5 and GETDISTANCETO1ST() <= 8) then
+											if (GETOFFCOACHAGGRESSIVENESS() >= 75 or GETRANDOMNUMBER(1) < 10) then
+												SETPLAYGROUP(COFIRSTDOWN)
+												return
+											end
+										end
                                         SETPLAYGROUP(COWTIME)
                                         return  -- Maybe a real aggressive coach would try to convert this and put it away? Nah.
                                 end
