@@ -17,7 +17,7 @@ function DefensivePlay()
             end
         end
 
-        if (GETYARDSTOENDZONE()  <= 3 or GETYARDSTOENDZONE() >= 97) then
+        if (GETYARDSTOENDZONE()  <= 3 or GETYARDSTOENDZONE() >= 98) then
                 if(GETOFFFORMATION() == SET_BIG or GETOFFFORMATION() == SET_JUMBO or GETOFFFORMATION() ==  SET_GOALLINE or GETOFFFORMATION() == SET_OVERLOAD or GETOFFFORMATION() == SET_WILDCAT) then
                         if(ISOFFENSIVEPLAYARUN()) then
                                 SETPLAYGROUP(CDGOALRUN)
@@ -36,15 +36,15 @@ function DefensivePlay()
                         end        
                 elseif(GETOFFFORMATION() == SET_3WR) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDGOALRUN)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         end
                 elseif(GETOFFFORMATION()  == SET_4WR) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
                                 SETPLAYGROUP(CDNORM)
@@ -52,15 +52,15 @@ function DefensivePlay()
                         end
                 elseif(GETOFFFORMATION()  == SET_TRIPS) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDGOALLINE)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         end
                 elseif(GETOFFFORMATION()  == SET_EMPTY) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDNORM)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
                                 SETPLAYGROUP(CDNORM)
@@ -68,10 +68,10 @@ function DefensivePlay()
                         end 
                 elseif(GETOFFFORMATION()  == SET_BUNCH) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDRUN)
+                                SETPLAYGROUP(CDGOALLINE)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDNORM)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         end        
 
@@ -79,7 +79,7 @@ function DefensivePlay()
                         SETPLAYGROUP(CDNORM)
                         return
                 end
-        end
+        end      
 
         -- The next section checks to see if the offense lines up in a Goal Line set (JUMBO) anywhere on the field and calls an appropriate defense 
         -- Added GOALLINE, WILDCAT, OVERLOAD and added a down check - LR 8/6/10
@@ -106,7 +106,7 @@ function DefensivePlay()
                                 SETPLAYGROUP(CDRUN)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDNICPASS)
+                                SETPLAYGROUP(CDNICKEL)
                                 return
                         end
                 elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -199,7 +199,7 @@ function DefensivePlay()
 		end
         
         -- Offense in hail mary formation (and not in some weird, tricky situation).
-        if (GETOFFPLAYGROUP(COHAILMARY) and ISOFFENSIVEPLAYAPASS() and GETYARDSTOENDZONE() >= 20) then
+        if (GETOFFPLAYGROUP(COHAILMARY) and GETYARDSTOENDZONE() >= 20) then
             if (GETTIMEREMAININGHALF() < 20) then
                 SETPLAYGROUP(CDDEFHAILMARY)
                 return
@@ -250,7 +250,7 @@ function DefensivePlay()
                                 SETPLAYGROUP(CDNICPASS)
                                 return
                         end
-                        SETPLAYGROUP(CDNICPASS)
+                        SETPLAYGROUP(CDPASS)
                         return
                 end
                 -- 1st down is almost exactly the same as 2nd down except first GETDISTANCETO1ST()
@@ -277,7 +277,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
@@ -331,7 +331,7 @@ function DefensivePlay()
                         end
                 end       
                  
-                if (GETDISTANCETO1ST() > 7 and GETDOWN() == 2) then  -- It's 1st or 2nd down with 8-10 GETDISTANCETO1ST()
+                if (GETDISTANCETO1ST() > 7 and GETDOWN() == 2) then  -- It's 2nd down with 8-10 GETDISTANCETO1ST()
                         if(GETOFFFORMATION() == SET_NORMAL or GETOFFFORMATION() == SET_JUMBO) then
                                 if(ISOFFENSIVEPLAYARUN()) then
                                         SETPLAYGROUP(CDNORM)
@@ -345,7 +345,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICRUN)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -353,7 +353,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_BIG) then
@@ -421,7 +421,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICRUN)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -429,7 +429,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_BIG) then
@@ -581,7 +581,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNORM)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_BIG) then
@@ -657,7 +657,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_3WR) then
@@ -665,7 +665,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -732,7 +732,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_3WR) then
@@ -741,7 +741,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -758,7 +758,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNORM)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION() == SET_TRIPS) then
@@ -818,7 +818,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICRUN)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -898,10 +898,10 @@ function DefensivePlay()
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
                                 if(ISOFFENSIVEPLAYARUN()) then
-                                        SETPLAYGROUP(CDNICRUN)
+                                        SETPLAYGROUP(CDNORM)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_BIG or GETOFFFORMATION() == SET_JUMBO) then
@@ -975,7 +975,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_3WR) then
@@ -983,7 +983,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICKEL)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -1058,7 +1058,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDNICRUN)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDPASS)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_4WR) then
@@ -1141,7 +1141,7 @@ function DefensivePlay()
                                         SETPLAYGROUP(CDRUN)
                                         return
                                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                                        SETPLAYGROUP(CDNICPASS)
+                                        SETPLAYGROUP(CDNICKEL)
                                         return
                                 end
                         elseif(GETOFFFORMATION()  == SET_BIG) then

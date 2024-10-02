@@ -40,8 +40,14 @@ function DefensiveTimeOut()
 
 			-- Call a TIMEOUT because it's 4th down and we can make them punt or kick the FG
 			if (GETQUARTER()  == 2 and GETTIMEREMAININGHALF()  < 120 and GETTIMEREMAININGHALF()  >= 10 and GETDEFTIMEOUTS()  >= 1 and GETDOWN()  == 4 and GETPLAYCLOCKREMAINING()  >= 30) then
-				SETPLAY(TIMEOUT)
-				return
+				if (GETTIMEREMAININGHALF() > 20) then
+					SETPLAY(TIMEOUT)
+					return
+				end
+				if (GETTIMEREMAININGHALF() <= 20 and GETYARDSTOENDZONE() > 28) then 
+					SETPLAY(TIMEOUT)
+					return
+				end				
 			end
 
 			-- Call a TIMEOUT inside :10 only if they are really backed up
@@ -107,18 +113,101 @@ function DefensiveTimeOut()
 			end
 			
 			-- we're losing at the end of the game, start calling TOs
-			if (GETQUARTER()  == 4 and GETTIMEREMAINING()  < 210 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  > 0 and GETPLAYCLOCKREMAINING()  >= 35) then
-				if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 24 and GETTIMEREMAINING() > 75) then -- down 3 scores, call TOs under 3:30 (but not under 1:15, since the game is definitely over by then)
+			if (GETQUARTER()  == 4 and GETTIMEREMAINING()  < 240 and GETDEFTIMEOUTS()  >= 1 and GETSCOREDIFF()  > 0 and GETPLAYCLOCKREMAINING()  >= 35) then
+				if (GETTIMEREMAINING() > 120 and GETDOWN() > 1) then
+					if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 24 and GETTIMEREMAINING() > 75) then -- down 3 scores, call TOs under 4:00 (but not under 1:15, since the game is definitely over by then)
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETTIMEREMAINING()  < 210 and GETSCOREDIFF()  >= 9 and GETSCOREDIFF()  <= 16 and GETTIMEREMAINING() > 20) then -- down 2 scores, call TOs under 3:30 (but not under 0:20, since the game is definitely over by then)
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETTIMEREMAINING()  < 180 and GETSCOREDIFF()  >= 1 and GETSCOREDIFF()  <= 8) then -- down 1 score, call TOs under 3:00
+						if (GETDOWN() <= 3) then
+							SETPLAY(TIMEOUT)
+							return
+						end
+						if (GETDOWN() == 4) then  -- 4th down has special circumstances, as some teams may want to keep their final timeout for offense
+							if (GETTIMEREMAINING() <= 105) then  -- call timeout if the offense would get the ball back with around a minute or less remaining once the playclock runs out
+								SETPLAY(TIMEOUT)
+								return
+							end
+							if (GETTIMEREMAINING() > 105) then  -- if the offense would get the ball back with over a minute, flip a coin. maybe the coach wants the extra time, maybe they want insurance if something goes wrong
+								if (GETYARDSTOENDZONE() <= 33 and GETSCOREDIFF() >= 6) then
+									SETPLAY(TIMEOUT)
+									return
+								end								
+								if (GETRANDOMNUMBER(1) < 50) then  -- offense not in scoring range and should get the ball back with at least a minute. maybe the coach wants to save that last timeout
+									SETPLAY(TIMEOUT)
+									return
+								end	
+							end
+						end	
+					end					
+				end
+				if (GETTIMEREMAINING() <= 120) then
+					if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 24 and GETTIMEREMAINING() > 75) then -- down 3 scores, call TOs under 4:00 (but not under 1:15, since the game is definitely over by then)
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETTIMEREMAINING()  < 210 and GETSCOREDIFF()  >= 9 and GETSCOREDIFF()  <= 16 and GETTIMEREMAINING() > 20) then -- down 2 scores, call TOs under 3:30 (but not under 0:20, since the game is definitely over by then)
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETTIMEREMAINING()  < 180 and GETSCOREDIFF()  >= 1 and GETSCOREDIFF()  <= 8) then -- down 1 score, call TOs under 3:00
+						if (GETDOWN() <= 3) then
+							SETPLAY(TIMEOUT)
+							return
+						end
+						if (GETDOWN() == 4) then  -- 4th down has special circumstances, as some teams may want to keep their final timeout for offense
+							if (GETTIMEREMAINING() <= 105) then  -- call timeout if the offense would get the ball back with around a minute or less remaining once the playclock runs out
+								SETPLAY(TIMEOUT)
+								return
+							end
+							if (GETTIMEREMAINING() > 105) then  -- if the offense would get the ball back with over a minute, flip a coin. maybe the coach wants the extra time, maybe they want insurance if something goes wrong
+								if (GETYARDSTOENDZONE() <= 33 and GETSCOREDIFF() >= 6) then
+									SETPLAY(TIMEOUT)
+									return
+								end								
+								if (GETRANDOMNUMBER(1) < 50) then  -- offense not in scoring range and should get the ball back with at least a minute. maybe the coach wants to save that last timeout
+									SETPLAY(TIMEOUT)
+									return
+								end	
+							end
+						end	
+					end					
+				end				
+				
+				if (GETSCOREDIFF()  >= 17 and GETSCOREDIFF()  <= 24 and GETTIMEREMAINING() > 75) then -- down 3 scores, call TOs under 4:00 (but not under 1:15, since the game is definitely over by then)
 					SETPLAY(TIMEOUT)
 					return
 				end
-				if (GETTIMEREMAINING()  < 180 and GETSCOREDIFF()  >= 9 and GETSCOREDIFF()  <= 16 and GETTIMEREMAINING() > 20) then -- down 2 scores, call TOs under 3:00 (but not under 0:20, since the game is definitely over by then)
+				if (GETTIMEREMAINING()  < 210 and GETSCOREDIFF()  >= 9 and GETSCOREDIFF()  <= 16 and GETTIMEREMAINING() > 20) then -- down 2 scores, call TOs under 3:30 (but not under 0:20, since the game is definitely over by then)
 					SETPLAY(TIMEOUT)
 					return
 				end
-				if (GETTIMEREMAINING()  < 150 and GETSCOREDIFF()  >= 1 and GETSCOREDIFF()  <= 8) then -- down 1 score, call TOs under 2:30
-					SETPLAY(TIMEOUT)
-					return
+				if (GETTIMEREMAINING()  < 180 and GETSCOREDIFF()  >= 1 and GETSCOREDIFF()  <= 8) then -- down 1 score, call TOs under 3:00
+					if (GETDOWN() <= 3) then
+						SETPLAY(TIMEOUT)
+						return
+					end
+					if (GETDOWN() == 4) then  -- 4th down has special circumstances, as some teams may want to keep their final timeout for offense
+						if (GETTIMEREMAINING() <= 105) then  -- call timeout if the offense would get the ball back with around a minute or less remaining once the playclock runs out
+							SETPLAY(TIMEOUT)
+							return
+						end
+						if (GETTIMEREMAINING() > 105) then  -- if the offense would get the ball back with over a minute, flip a coin. maybe the coach wants the extra time, maybe they want insurance if something goes wrong
+							if (GETYARDSTOENDZONE() <= 33 and GETSCOREDIFF() >= 6) then
+								SETPLAY(TIMEOUT)
+								return
+							end								
+							if (GETRANDOMNUMBER(1) < 50) then  -- offense not in scoring range and should get the ball back with at least a minute. maybe the coach wants to save that last timeout
+								SETPLAY(TIMEOUT)
+								return
+							end	
+						end
+					end	
 				end
 			end
 			
