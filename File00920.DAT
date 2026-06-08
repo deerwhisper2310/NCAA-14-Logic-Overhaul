@@ -17,7 +17,7 @@ function DefensivePlay()
             end
         end
 
-        if (GETYARDSTOENDZONE()  <= 3 or GETYARDSTOENDZONE() >= 98) then
+        if (GETYARDSTOENDZONE()  <= 5 or GETYARDSTOENDZONE() >= 98) then
                 if(GETOFFFORMATION() == SET_BIG or GETOFFFORMATION() == SET_JUMBO or GETOFFFORMATION() ==  SET_GOALLINE or GETOFFFORMATION() == SET_OVERLOAD or GETOFFFORMATION() == SET_WILDCAT) then
                         if(ISOFFENSIVEPLAYARUN()) then
                                 SETPLAYGROUP(CDGOALRUN)
@@ -44,15 +44,15 @@ function DefensivePlay()
                         end
                 elseif(GETOFFFORMATION()  == SET_4WR) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDNORM)
+                                SETPLAYGROUP(CDGOALRUN)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDNORM)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         end
                 elseif(GETOFFFORMATION()  == SET_TRIPS) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDGOALLINE)
+                                SETPLAYGROUP(CDGOALRUN)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
                                 SETPLAYGROUP(CDGOALPASS)
@@ -60,15 +60,15 @@ function DefensivePlay()
                         end
                 elseif(GETOFFFORMATION()  == SET_EMPTY) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDNORM)
+                                SETPLAYGROUP(CDGOALRUN)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
-                                SETPLAYGROUP(CDNORM)
+                                SETPLAYGROUP(CDGOALPASS)
                                 return
                         end 
                 elseif(GETOFFFORMATION()  == SET_BUNCH) then
                         if(ISOFFENSIVEPLAYARUN()) then
-                                SETPLAYGROUP(CDGOALLINE)
+                                SETPLAYGROUP(CDGOALRUN)
                                 return
                         elseif(ISOFFENSIVEPLAYAPASS()) then
                                 SETPLAYGROUP(CDGOALPASS)
@@ -76,7 +76,7 @@ function DefensivePlay()
                         end        
 
                 elseif(GETOFFPLAYGROUP(COPUNT)) then  -- this is weird, but matches the legacy script
-                        SETPLAYGROUP(CDNORM)
+                        SETPLAYGROUP(CDGOALPASS)
                         return
                 end
         end      
@@ -144,10 +144,10 @@ function DefensivePlay()
                 end
 
                 if(ISOFFENSIVEPLAYARUN()) then
-                        SETPLAYGROUP(CDRUN)
+                        SETPLAYGROUP(CDGOALLINE)
                         return
                 elseif(ISOFFENSIVEPLAYAPASS()) then
-                        SETPLAYGROUP(CDPASS)
+                        SETPLAYGROUP(CDWILDCAT)
                         return
                 end
         end
@@ -219,10 +219,10 @@ function DefensivePlay()
 		
                 if(GETSCOREDIFF() < 0 and GETTIMEREMAINING() <= 240) then
 					if(GETDISTANCETO1ST() <= 10) then
-						SETPLAYGROUP(CDRUN)
+						SETPLAYGROUP(CDGOALLINE)
 						return
 					end	
-					SETPLAYGROUP(CDNORM)
+					SETPLAYGROUP(CDWILDCAT)
 					return
                 end		
 
@@ -638,10 +638,10 @@ function DefensivePlay()
 		
                 if(GETSCOREDIFF() < 0 and GETTIMEREMAINING() <= 240) then
 					if(GETDISTANCETO1ST() <= 10) then
-						SETPLAYGROUP(CDRUN)
+						SETPLAYGROUP(CDGOALLINE)
 						return
 					end	
-					SETPLAYGROUP(CDNICRUN)
+					SETPLAYGROUP(CDWILDCAT)
 					return
                 end		
 
